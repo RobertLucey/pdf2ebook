@@ -20,6 +20,13 @@ class GenericPageTest(TestCase):
             'fr'
         )
 
+        page = GenericPage()
+        page.text_content = ""
+        self.assertEqual(
+            page.lang,
+            None
+        )
+
 
 class PageTest(TestCase):
 

@@ -18,7 +18,7 @@ class GenericPage:
         try:
             lang = langdetect.detect(self.text_content[:1000])
         except langdetect.lang_detect_exception.LangDetectException:
-            lang = "en"
+            lang = None
 
         return lang
 

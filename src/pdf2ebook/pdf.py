@@ -68,10 +68,11 @@ class PDF:
 
         langs = [page.lang for page in self.pages]
         lang = max(set(langs), key=langs.count)
-
-        logger.debug(f"Language detected: {lang}")
-
-        book.set_language(lang)
+        if lang is None:
+            logger.warning("Could not detect language")
+        else:
+            logger.debug(f"Language detected: {lang}")
+            book.set_language(lang)
 
         opts = {"plugins": [standard.SyntaxPlugin()]}
         epub.write_epub(path, book, opts)
