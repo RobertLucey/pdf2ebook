@@ -11,7 +11,7 @@ INSTALL_REQUIRES = (
 
 setup(
     name='pdf2ebook',
-    version='1.0.0',
+    version='1.1.0',
     python_requires='>=3.6',
     description='PDF to ebook',
     long_description='PDF to ebook',
@@ -22,7 +22,7 @@ setup(
     install_requires=INSTALL_REQUIRES,
     entry_points={
         'console_scripts': [
-            'convert = pdf2ebook.bin.convert:main'
+            'pdf2epub = pdf2ebook.bin.convert:main'
         ]
     }
 )

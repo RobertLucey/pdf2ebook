@@ -14,4 +14,4 @@ PDFToHTML - `sudo apt install pdftohtml`
 Usage
 =====
 
-`python convert.py --in something.pdf --out other.epub`
+`pdf2epub --in something.pdf --out other.epub`
