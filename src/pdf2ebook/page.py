@@ -27,8 +27,8 @@ class Page:
 
         # TODO: find if at the top or bottom. Be told from pages when adding context
         # Also need to remove author name if first or last phrase
-        first_line = self.content.strip().split("\n")[0]
-        last_line = self.content.strip().split("\n")[-1]
+        first_line = self.text_content.strip().split("\n")[0]
+        last_line = self.text_content.strip().split("\n")[-1]
 
         if first_line.isdigit():
             return first_line
@@ -40,7 +40,7 @@ class Page:
     @property
     def html_content(self):
         content = ""
-        for para in self.content.split("\n\n"):
+        for para in self.text_content.split("\n\n"):
             content += "<p>" + para + "</p>"
         return content
 
