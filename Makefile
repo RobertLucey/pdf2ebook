@@ -33,4 +33,5 @@ quick_build:
 test: build test_requirements quick_test
 
 quick_test:
-	$(IN_ENV) $(TEST_CONTEXT) $(PYTHON) -m unittest
+	$(IN_ENV) $(TEST_CONTEXT) coverage run -m unittest
+	$(IN_ENV) $(TEST_CONTEXT) coverage report -m
