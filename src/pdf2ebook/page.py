@@ -92,7 +92,7 @@ class HTMLPage(GenericPage):
 
             real_path = img["src"]
 
-            new_path = '/tmp/' + os.path.basename(real_path)
+            new_path = os.path.basename(real_path)
             try:
                 shutil.copy(real_path, new_path)
             except:
