@@ -1,4 +1,8 @@
-from unittest import TestCase
+import os
+
+from unittest import TestCase, skip
+
+from PIL import Image
 
 from pdf2ebook.page import Page, HTMLPage, GenericPage
 
@@ -95,4 +99,34 @@ class PageTest(TestCase):
 class HTMLPageTest(TestCase):
 
     def test_images(self):
+        image = Image.new('RGB', (1, 1))
+
+        try:
+            os.remove("/tmp/pdf2ebook_test_images.png")
+        except:
+            pass
+
+        image.save("/tmp/pdf2ebook_test_images.png", "PNG")
+
+        page = HTMLPage(0, '<img src="/tmp/test_images.png"></img>')
+        self.assertEqual(
+            len(page.images),
+            1
+        )
+
+    @skip('Need to implement')
+    def test_page_no(self):
         pass
+
+    def test_html_content(self):
+        page = HTMLPage(0, '<p>something something</p>')
+        self.assertEqual(
+            page.html_content,
+            '<p>something something</p>'
+        )
+
+        page = HTMLPage(0, '<p>something something</p><img src="/tmp/test_images.png"></img>')
+        self.assertEqual(
+            page.html_content,
+            '<p>something something</p><img src="test_images.png"/>'
+        )
