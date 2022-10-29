@@ -34,6 +34,3 @@ test: build test_requirements quick_test
 
 quick_test:
 	$(IN_ENV) $(TEST_CONTEXT) $(PYTHON) -m unittest
-
-load:
-	$(IN_ENV) load_road_collisions
