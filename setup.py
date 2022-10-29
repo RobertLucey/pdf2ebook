@@ -6,12 +6,13 @@ from setuptools import (
 INSTALL_REQUIRES = (
     'pdf2text',
     'ebooklib',
-    'bs4'
+    'bs4',
+    'langdetect'
 )
 
 setup(
     name='pdf2ebook',
-    version='1.2.0',
+    version='1.3.0',
     python_requires='>=3.6',
     description='PDF to ebook',
     long_description='PDF to ebook',

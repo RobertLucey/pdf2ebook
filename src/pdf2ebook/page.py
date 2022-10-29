@@ -3,6 +3,7 @@ from io import StringIO
 import shutil
 
 import bs4
+import langdetect
 
 from ebooklib import epub
 from ebooklib.utils import create_pagebreak
@@ -45,12 +46,21 @@ class Page:
         return content
 
     @property
+    def lang(self):
+        try:
+            lang = langdetect.detect(self.text_content[:1000])
+        except langdetect.lang_detect_exception.LangDetectException:
+            lang = 'en'
+
+        return lang
+
+    @property
     def epub_content(self):
         # need a different content that strips headers and footers
         c = epub.EpubHtml(
             title=f"title_{self.idx}",
             file_name=f"page_{self.idx}.xhtml",
-            lang="en",
+            lang=self.lang,
             uid=str(self.idx),
         )
         c.content = self.html_content
@@ -109,12 +119,22 @@ class HTMLPage:
         return self.content
 
     @property
+    def lang(self):
+        try:
+            lang = langdetect.detect(self.text_content[:1000])
+        except langdetect.lang_detect_exception.LangDetectException:
+            lang = 'en'
+
+        return lang
+
+    @property
     def epub_content(self):
+
         # need a different content that strips headers and footers
         epub_page = epub.EpubHtml(
             title=f"title_{self.idx}",
             file_name=f"page_{self.idx}.xhtml",
-            lang="en",
+            lang=self.lang,
             uid=str(self.idx),
         )
         epub_page.content = self.html_content

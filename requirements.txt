@@ -1,3 +1,4 @@
 pdf2text
 ebooklib
 bs4
+langdetect

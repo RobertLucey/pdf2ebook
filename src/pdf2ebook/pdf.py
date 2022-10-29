@@ -30,7 +30,6 @@ class PDF:
 
         # add metadata
         book.set_title(os.path.splitext(os.path.basename(self.pdf_path))[0])
-        book.set_language("en")  # TODO: detect
 
         book.add_author("")
 
@@ -51,8 +50,16 @@ class PDF:
 
         book.spine = ["nav"] + [c.epub_content for c in contents]
 
+        langs = [page.lang for page in self.pages]
+        lang = max(set(langs), key=langs.count)
+
+        logger.debug(f'Language detected: {lang}')
+
+        book.set_language(lang)
+
         opts = {"plugins": [standard.SyntaxPlugin()]}
         epub.write_epub(path, book, opts)
+        logger.debug(f'Epub saved: {path}')
 
     def load_text(self):
         self.text_file = self.pdf_path + ".txt"
@@ -105,12 +112,11 @@ class PDF:
 
     @property
     def pages(self):
-        # assume pages are numbered with newlines padding
-
         # TODO Find contents / table of contents and start after that. Who needs acks
         pages = Pages()
 
         if self.use_text:
+            logger.debug('Generating pages using only text')
             # TODO: if all the content looks to be in html, use that rather than text
             for idx, (p, c, n) in enumerate(
                 window(self.text_content.split("\x0c"), window_size=3)
@@ -118,12 +124,11 @@ class PDF:
                 pages.append(Page(idx, self.text_content))
 
         elif self.use_html:
+            logger.debug('Generating pages using html')
 
             soup = bs4.BeautifulSoup(open(self.html_file), "html.parser")
             html_content = open(self.html_file, "r").read()
-
             body = soup.find("body")
-
             breaks = body.find_all("hr")
 
             page_idx = 0
@@ -149,5 +154,7 @@ class PDF:
             raise Exception("Could not convert")
 
         pages.set_context()
+
+        logger.debug(f'Generated {len(pages)} pages')
 
         return pages
