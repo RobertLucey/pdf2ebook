@@ -1,10 +1,10 @@
 import os
-from io import StringIO
 
 import bs4
 from ebooklib import epub
 from ebooklib.plugins import standard
 
+from pdf2ebook import logger
 from pdf2ebook.page import Page, HTMLPage
 from pdf2ebook.pages import Pages
 from pdf2ebook.utils import window
@@ -23,6 +23,9 @@ class PDF:
         self.html_file = None
 
     def to_epub(self, path=None):
+        if self.use_text:
+            logger.warning('Only using text, images will not be included')
+
         book = epub.EpubBook()
 
         # add metadata
@@ -58,7 +61,7 @@ class PDF:
             os.system(f"pdftotext '{self.pdf_path}' '{self.text_file}'")
 
         if not os.path.exists(self.text_file):
-            print("Could not convert pdf to text: %s" % (self.text_file))
+            logger.error("Could not convert pdf to text: %s" % (self.text_file))
             return
 
         self.text_content = open(self.text_file, "r").read()
@@ -70,7 +73,7 @@ class PDF:
             os.system(f"pdftohtml '{self.pdf_path}'")
 
         if not os.path.exists(self.html_file):
-            print("Could not convert pdf to html: %s" % (self.html_file))
+            logger.error("Could not convert pdf to html: %s" % (self.html_file))
             self.loaded = True
             return
 
