@@ -14,6 +14,7 @@ setup(
     version='1.0.0',
     python_requires='>=3.6',
     description='PDF to ebook',
+    long_description='PDF to ebook',
     author='Robert Lucey',
     url='https://github.com/RobertLucey/pdf2ebook',
     packages=find_packages('src'),
