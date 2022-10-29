@@ -1,4 +1,4 @@
-PYTHON=python3
+PYTHON=python3.10
 
 # TODO: might be nice to have a non threading setting
 TEST_CONTEXT=export TEST_ENV=True &&
@@ -33,7 +33,7 @@ quick_build:
 test: build test_requirements quick_test
 
 quick_test:
-	$(IN_ENV) $(PYTHON) -m unittest
+	$(IN_ENV) $(TEST_CONTEXT) $(PYTHON) -m unittest
 
 load:
 	$(IN_ENV) load_road_collisions
