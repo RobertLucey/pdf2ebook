@@ -13,13 +13,12 @@ from pdf2ebook.w2n import word_to_num
 
 
 class GenericPage:
-
     @cached_property
     def lang(self):
         try:
             lang = langdetect.detect(self.text_content[:1000])
         except langdetect.lang_detect_exception.LangDetectException:
-            lang = 'en'
+            lang = "en"
 
         return lang
 
@@ -79,15 +78,15 @@ class Page(GenericPage):
     @property
     def epub_content(self):
         # need a different content that strips headers and footers
-        c = epub.EpubHtml(
+        epub_page = epub.EpubHtml(
             title=f"title_{self.idx}",
             file_name=f"page_{self.idx}.xhtml",
             lang=self.lang,
             uid=str(self.idx),
         )
-        c.content = self.html_content
-        c.content += create_pagebreak(f"p_{self.idx}")
-        return c
+        epub_page.content = self.html_content
+        epub_page.content += create_pagebreak(f"p_{self.idx}")
+        return epub_page
 
 
 class HTMLPage(GenericPage):

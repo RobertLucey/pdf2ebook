@@ -1,4 +1,5 @@
 import os
+from io import StringIO
 
 import bs4
 from ebooklib import epub
@@ -28,7 +29,7 @@ class PDF:
         self.load()
 
         if self.use_text:
-            logger.warning('Only using text, images will not be included')
+            logger.warning("Only using text, images will not be included")
 
         book = epub.EpubBook()
 
@@ -47,6 +48,17 @@ class PDF:
                     book.add_item(image)
 
         for page in contents:
+            if (
+                bs4.BeautifulSoup(
+                    StringIO(page.epub_content.content), "html.parser"
+                ).text
+                == ""
+                and bs4.BeautifulSoup(
+                    StringIO(page.epub_content.content), "html.parser"
+                ).find("img")
+                is None
+            ):
+                continue
             book.add_item(page.epub_content)
 
         book.add_item(epub.EpubNcx())
@@ -57,13 +69,13 @@ class PDF:
         langs = [page.lang for page in self.pages]
         lang = max(set(langs), key=langs.count)
 
-        logger.debug(f'Language detected: {lang}')
+        logger.debug(f"Language detected: {lang}")
 
         book.set_language(lang)
 
         opts = {"plugins": [standard.SyntaxPlugin()]}
         epub.write_epub(path, book, opts)
-        logger.debug(f'Epub saved: {path}')
+        logger.debug(f"Epub saved: {path}")
 
     def load_text(self):
         self.text_file = self.pdf_path + ".txt"
@@ -125,7 +137,7 @@ class PDF:
         pages = Pages()
 
         if self.use_text:
-            logger.debug('Generating pages using only text')
+            logger.debug("Generating pages using only text")
             # TODO: if all the content looks to be in html, use that rather than text
             for idx, (p, c, n) in enumerate(
                 window(self.text_content.split("\x0c"), window_size=3)
@@ -133,7 +145,7 @@ class PDF:
                 pages.append(Page(idx, self.text_content))
 
         elif self.use_html:
-            logger.debug('Generating pages using html')
+            logger.debug("Generating pages using html")
 
             soup = bs4.BeautifulSoup(open(self.html_file), "html.parser")
             html_content = open(self.html_file, "r").read()
@@ -164,6 +176,6 @@ class PDF:
 
         pages.set_context()
 
-        logger.debug(f'Generated {len(pages)} pages')
+        logger.debug(f"Generated {len(pages)} pages")
 
         return pages
