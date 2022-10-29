@@ -2,3 +2,4 @@
 show_missing = True
 omit =
     src/pdf2ebook/w2n.py
+    test/*
