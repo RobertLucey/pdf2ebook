@@ -19,7 +19,7 @@ jobs:
         python-version: '3.10'
     - name: Install dependencies
       run: |
-        sudo apt-get install make
+        sudo apt-get install make pdftohtml
         python -m pip install --upgrade pip
         python -m pip install virtualenv
     - name: Test
@@ -37,7 +37,7 @@ jobs:
         python-version: '3.10'
     - name: Install dependencies
       run: |
-        sudo apt-get install make
+        sudo apt-get install make pdftohtml
         python -m pip install --upgrade pip
         python -m pip install virtualenv
     - name: Build package
