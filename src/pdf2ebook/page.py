@@ -96,7 +96,11 @@ class HTMLPage(GenericPage):
         self.next_page = None
 
         soup = bs4.BeautifulSoup(StringIO(content), "html.parser")
-        soup.hr.decompose()
+
+        try:
+            soup.hr.decompose()
+        except:
+            logger.warning('No hr tags found, expecting a single page document')
 
         self.content = str(soup)
 
