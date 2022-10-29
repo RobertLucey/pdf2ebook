@@ -47,6 +47,12 @@ class PageTest(TestCase):
         )
 
     def test_page_no(self):
+        first = Page(0, 'blah blah blah')
+        self.assertEqual(
+            first.page_no,
+            None
+        )
+
         first = Page(0, '2\nblah blah blah')
         self.assertEqual(
             first.page_no,
