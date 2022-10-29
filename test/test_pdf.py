@@ -39,4 +39,4 @@ class PDFTest(TestCase):
     def test_to_epub(self):
         pdf = PDF(path='test/resources/alice.pdf')
         pdf.load()
-        pdf.to_epub()
+        pdf.to_epub('/tmp/test.epub')
