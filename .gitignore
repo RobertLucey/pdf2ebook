@@ -24,3 +24,10 @@ BUILD/
 BUILDROOT/
 SRPMS/
 SOURCES/
+
+*.jpg
+*.png
+*.gif
+*.html
+*.epub
+*.txt
