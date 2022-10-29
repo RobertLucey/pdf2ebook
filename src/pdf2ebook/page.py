@@ -9,6 +9,8 @@ from cached_property import cached_property
 from ebooklib import epub
 from ebooklib.utils import create_pagebreak
 
+from pdf2ebook.w2n import word_to_num
+
 
 class GenericPage:
 
@@ -44,10 +46,26 @@ class Page(GenericPage):
         first_line = self.text_content.strip().split("\n")[0]
         last_line = self.text_content.strip().split("\n")[-1]
 
+        first_line_num = None
+        try:
+            first_line_num = word_to_num(first_line)
+        except:
+            pass
+
+        last_line_num = None
+        try:
+            last_line_num = word_to_num(last_line)
+        except:
+            pass
+
         if first_line.isdigit():
-            return first_line
+            return int(first_line)
         elif last_line.isdigit():
-            return last_line
+            return int(last_line)
+        elif first_line_num:
+            return first_line_num
+        elif last_line_num:
+            return last_line_num
         else:
             return None
 
