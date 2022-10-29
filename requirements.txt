@@ -1,0 +1,3 @@
+pdf2text
+ebooklib
+bs4
