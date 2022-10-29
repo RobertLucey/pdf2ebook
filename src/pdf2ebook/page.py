@@ -4,6 +4,7 @@ import shutil
 
 import bs4
 import langdetect
+from cached_property import cached_property
 
 from ebooklib import epub
 from ebooklib.utils import create_pagebreak
@@ -45,7 +46,7 @@ class Page:
             content += "<p>" + para + "</p>"
         return content
 
-    @property
+    @cached_property
     def lang(self):
         try:
             lang = langdetect.detect(self.text_content[:1000])
@@ -118,7 +119,7 @@ class HTMLPage:
         self.content = str(soup)
         return self.content
 
-    @property
+    @cached_property
     def lang(self):
         try:
             lang = langdetect.detect(self.text_content[:1000])

@@ -3,6 +3,7 @@ import os
 import bs4
 from ebooklib import epub
 from ebooklib.plugins import standard
+from cached_property import cached_property
 
 from pdf2ebook import logger
 from pdf2ebook.page import Page, HTMLPage
@@ -110,7 +111,7 @@ class PDF:
 
         return False
 
-    @property
+    @cached_property
     def pages(self):
         # TODO Find contents / table of contents and start after that. Who needs acks
         pages = Pages()

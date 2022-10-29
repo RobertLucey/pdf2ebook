@@ -7,12 +7,13 @@ INSTALL_REQUIRES = (
     'pdf2text',
     'ebooklib',
     'bs4',
-    'langdetect'
+    'langdetect',
+    'cached_property'
 )
 
 setup(
     name='pdf2ebook',
-    version='1.3.0',
+    version='1.4.0',
     python_requires='>=3.6',
     description='PDF to ebook',
     long_description='PDF to ebook',

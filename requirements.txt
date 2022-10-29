@@ -2,3 +2,4 @@ pdf2text
 ebooklib
 bs4
 langdetect
+cached_property
