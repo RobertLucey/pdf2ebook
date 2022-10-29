@@ -70,3 +70,23 @@ class PageTest(TestCase):
             first.page_no,
             2
         )
+
+    def test_html_content(self):
+        first = Page(0, 'blah\n\nblah blah blah')
+        self.assertEqual(
+            first.html_content,
+            '<p>blah</p><p>blah blah blah</p>'
+        )
+
+    def test_epub_content(self):
+        first = Page(0, 'blah\n\nblah blah blah')
+        self.assertEqual(
+            first.epub_content.content,
+            '<p>blah</p><p>blah blah blah</p><span xmlns:epub="http://www.idpf.org/2007/ops" epub:type="pagebreak" title="p_0" id="p_0"/>'
+        )
+
+
+class HTMLPageTest(TestCase):
+
+    def test_images(self):
+        pass

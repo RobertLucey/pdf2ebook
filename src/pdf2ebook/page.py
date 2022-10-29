@@ -9,6 +9,7 @@ from cached_property import cached_property
 from ebooklib import epub
 from ebooklib.utils import create_pagebreak
 
+from pdf2ebook import logger
 from pdf2ebook.w2n import word_to_num
 
 
@@ -114,12 +115,18 @@ class HTMLPage(GenericPage):
                 shutil.copy(real_path, new_path)
             except:
                 pass
-            image_content = open(new_path, "rb").read()
-            epub_image.uid = f"image_{self.idx}_{idx}"
-            epub_image.file_name = new_path
-            epub_image.media_type = "image/png"  # TODO: detect
-            epub_image.set_content(image_content)
-            images.append(epub_image)
+
+            try:
+                image_content = open(new_path, "rb").read()
+            except:
+                logger.error(f'Could not get image content from path: {new_path}')
+
+            else:
+                epub_image.uid = f"image_{self.idx}_{idx}"
+                epub_image.file_name = new_path
+                epub_image.media_type = "image/png"  # TODO: detect
+                epub_image.set_content(image_content)
+                images.append(epub_image)
 
         return images
 
