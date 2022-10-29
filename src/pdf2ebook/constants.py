@@ -1,1 +1,1 @@
-LOG_LOCATION = "/opt/log/pdf2ebook/pdf2ebook.log"
+LOG_LOCATION = "/var/log/pdf2ebook/pdf2ebook.log"
