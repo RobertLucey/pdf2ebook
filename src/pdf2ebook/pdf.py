@@ -13,7 +13,6 @@ from pdf2ebook.utils import window
 
 class PDF:
     def __init__(self, *args, **kwargs):
-
         self.pdf_path = kwargs["path"]
         self.text_content = None
 
@@ -23,7 +22,11 @@ class PDF:
         self.text_file = None
         self.html_file = None
 
+        self.loaded = False
+
     def to_epub(self, path=None):
+        self.load()
+
         if self.use_text:
             logger.warning('Only using text, images will not be included')
 
@@ -86,6 +89,9 @@ class PDF:
             return
 
     def load(self):
+        if self.loaded:
+            return
+
         self.load_text()
         self.load_html()
 
@@ -113,6 +119,8 @@ class PDF:
 
     @cached_property
     def pages(self):
+        self.load()
+
         # TODO Find contents / table of contents and start after that. Who needs acks
         pages = Pages()
 

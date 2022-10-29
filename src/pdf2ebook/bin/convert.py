@@ -21,7 +21,6 @@ def main():
     args = parser.parse_args()
 
     pdf = PDF(path=args.in_file, use_html=args.force_html, use_text=args.force_text)
-    pdf.load()
     pdf.to_epub(path=args.out_file)
 
 
