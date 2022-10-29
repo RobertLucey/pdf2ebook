@@ -10,7 +10,19 @@ from ebooklib import epub
 from ebooklib.utils import create_pagebreak
 
 
-class Page:
+class GenericPage:
+
+    @cached_property
+    def lang(self):
+        try:
+            lang = langdetect.detect(self.text_content[:1000])
+        except langdetect.lang_detect_exception.LangDetectException:
+            lang = 'en'
+
+        return lang
+
+
+class Page(GenericPage):
     def __init__(self, idx, content):
         self.idx = idx
         self.next_page = None
@@ -46,15 +58,6 @@ class Page:
             content += "<p>" + para + "</p>"
         return content
 
-    @cached_property
-    def lang(self):
-        try:
-            lang = langdetect.detect(self.text_content[:1000])
-        except langdetect.lang_detect_exception.LangDetectException:
-            lang = 'en'
-
-        return lang
-
     @property
     def epub_content(self):
         # need a different content that strips headers and footers
@@ -69,7 +72,7 @@ class Page:
         return c
 
 
-class HTMLPage:
+class HTMLPage(GenericPage):
     def __init__(self, idx, content):
         self.idx = idx
         self.next_page = None
@@ -88,12 +91,13 @@ class HTMLPage:
             epub_image = epub.EpubImage()
 
             real_path = img["src"]
-            new_path = os.path.basename(real_path)
+
+            new_path = '/tmp/' + os.path.basename(real_path)
             try:
                 shutil.copy(real_path, new_path)
             except:
                 pass
-            image_content = open(real_path, "rb").read()
+            image_content = open(new_path, "rb").read()
             epub_image.uid = f"image_{self.idx}_{idx}"
             epub_image.file_name = new_path
             epub_image.media_type = "image/png"  # TODO: detect
@@ -118,15 +122,6 @@ class HTMLPage:
             img["src"] = os.path.basename(img["src"])
         self.content = str(soup)
         return self.content
-
-    @cached_property
-    def lang(self):
-        try:
-            lang = langdetect.detect(self.text_content[:1000])
-        except langdetect.lang_detect_exception.LangDetectException:
-            lang = 'en'
-
-        return lang
 
     @property
     def epub_content(self):
