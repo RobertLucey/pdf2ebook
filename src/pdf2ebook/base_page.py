@@ -11,3 +11,10 @@ class BasePage:
             lang = None
 
         return lang
+
+    @property
+    def cleaned_text_content(self):
+        content = []
+        for line in self.text_content.split("\n"):
+            content.append(line.strip())
+        return "\n".join(content)
