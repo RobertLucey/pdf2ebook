@@ -100,7 +100,7 @@ class HTMLPage(GenericPage):
         try:
             soup.hr.decompose()
         except:
-            logger.warning('No hr tags found, expecting a single page document')
+            logger.warning("No hr tags found, expecting a single page document")
 
         self.content = str(soup)
 
@@ -108,6 +108,8 @@ class HTMLPage(GenericPage):
     def images(self):
         soup = bs4.BeautifulSoup(StringIO(self.content), "html.parser")
         imgs = soup.find_all("img")
+        logger.debug(f"Found {len(imgs)} images in page {self.idx}")
+
         images = []
         for idx, img in enumerate(imgs):
             epub_image = epub.EpubImage()
@@ -117,14 +119,15 @@ class HTMLPage(GenericPage):
             new_path = os.path.basename(real_path)
             try:
                 shutil.copy(real_path, new_path)
-            except:
-                pass
+            except Exception as ex:
+                logger.debug(
+                    f'Could not copy image "{real_path}" -> "{new_path}": {ex}'
+                )
 
             try:
                 image_content = open(new_path, "rb").read()
             except:
-                logger.error(f'Could not get image content from path: {new_path}')
-
+                logger.error(f"Could not get image content from path: {new_path}")
             else:
                 epub_image.uid = f"image_{self.idx}_{idx}"
                 epub_image.file_name = new_path
