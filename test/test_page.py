@@ -99,16 +99,15 @@ class PageTest(TestCase):
 class HTMLPageTest(TestCase):
 
     def test_images(self):
-        image = Image.new('RGB', (1, 1))
-
         try:
             os.remove("/tmp/pdf2ebook_test_images.png")
         except:
             pass
 
+        image = Image.new('RGB', (1, 1))
         image.save("/tmp/pdf2ebook_test_images.png", "PNG")
 
-        page = HTMLPage(0, '<img src="/tmp/test_images.png"></img>')
+        page = HTMLPage(0, '<img src="/tmp/pdf2ebook_test_images.png"></img>')
         self.assertEqual(
             len(page.images),
             1
