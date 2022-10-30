@@ -9,11 +9,7 @@ class AlicePDFTest(TestCase):
 
     PDF_PATH = 'test/resources/alice.pdf'
     EPUB_NAME = 'test_alice.epub'
-
-    def test_to_html(self):
-        pdf = PDF(path=self.PDF_PATH)
-        pdf.load()
-        self.assertEquals(len(pdf.pages), 21)
+    EXPECTED_PAGES = 21
 
     def test_pages_content(self):
         pdf = PDF(path=self.PDF_PATH)
@@ -54,4 +50,13 @@ class AlicePDFTest(TestCase):
         pdf.to_epub(f'/tmp/{self.EPUB_NAME}')
         self.assertTrue(
             os.path.exists(f'/tmp/{self.EPUB_NAME}')
+        )
+
+    def test_to_html(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
+        self.assertGreater(
+            os.path.getsize(f'/tmp/{self.EPUB_NAME}'),
+            0
         )

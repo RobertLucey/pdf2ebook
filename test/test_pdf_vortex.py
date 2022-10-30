@@ -9,11 +9,7 @@ class VortexPDFTest(TestCase):
 
     PDF_PATH = 'test/resources/vortex.pdf'
     EPUB_NAME = 'test_vortex.epub'
-
-    def test_to_html(self):
-        pdf = PDF(path=self.PDF_PATH)
-        pdf.load()
-        self.assertEquals(len(pdf.pages), 16)
+    EXPECTED_PAGES = 16
 
     def test_pages_content(self):
         pdf = PDF(path=self.PDF_PATH)
@@ -49,4 +45,13 @@ class VortexPDFTest(TestCase):
         pdf.to_epub(f'/tmp/{self.EPUB_NAME}')
         self.assertTrue(
             os.path.exists(f'/tmp/{self.EPUB_NAME}')
+        )
+
+    def test_to_html(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
+        self.assertGreater(
+            os.path.getsize(f'/tmp/{self.EPUB_NAME}'),
+            0
         )

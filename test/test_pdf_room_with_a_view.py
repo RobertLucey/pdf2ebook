@@ -9,11 +9,7 @@ class RoomWithAViewPDFTest(TestCase):
 
     PDF_PATH = 'test/resources/room_with_a_view.pdf'
     EPUB_NAME = 'test_room_with_a_view.epub'
-
-    def test_to_html(self):
-        pdf = PDF(path=self.PDF_PATH)
-        pdf.load()
-        self.assertEquals(len(pdf.pages), 151)
+    EXPECTED_PAGES = 151
 
     def test_pages_content(self):
         pdf = PDF(path=self.PDF_PATH)
@@ -51,3 +47,12 @@ class RoomWithAViewPDFTest(TestCase):
         self.assertTrue(
             os.path.exists(f'/tmp/{self.EPUB_NAME}')
         )
+        self.assertGreater(
+            os.path.getsize(f'/tmp/{self.EPUB_NAME}'),
+            0
+        )
+
+    def test_to_html(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
