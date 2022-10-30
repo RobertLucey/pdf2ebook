@@ -7,7 +7,8 @@ from ebooklib.plugins import standard
 from cached_property import cached_property
 
 from pdf2ebook import logger
-from pdf2ebook.page import Page, HTMLPage
+from pdf2ebook.text_page import TextPage
+from pdf2ebook.html_page import HTMLPage
 from pdf2ebook.pages import Pages
 from pdf2ebook.utils import window
 
@@ -141,7 +142,7 @@ class PDF:
             for idx, (p, c, n) in enumerate(
                 window(self.text_content.split("\x0c"), window_size=3)
             ):
-                pages.append(Page(idx, self.text_content))
+                pages.append(TextPage(idx, self.text_content))
 
         elif self.use_html:
             logger.debug("Generating pages using html")

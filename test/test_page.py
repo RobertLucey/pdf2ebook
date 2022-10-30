@@ -4,27 +4,29 @@ from unittest import TestCase, skip
 
 from PIL import Image
 
-from pdf2ebook.page import Page, HTMLPage, GenericPage
+from pdf2ebook.text_page import TextPage
+from pdf2ebook.html_page import HTMLPage
+from pdf2ebook.base_page import BasePage
 
 
-class GenericPageTest(TestCase):
+class BasePageTest(TestCase):
 
     def test_lang(self):
-        page = GenericPage()
+        page = BasePage()
         page.text_content = 'This program converts files of one format into another'
         self.assertEqual(
             page.lang,
             'en'
         )
 
-        page = GenericPage()
+        page = BasePage()
         page.text_content = "Ce programme convertit les fichiers d'un format dans un autre"
         self.assertEqual(
             page.lang,
             'fr'
         )
 
-        page = GenericPage()
+        page = BasePage()
         page.text_content = ""
         self.assertEqual(
             page.lang,
@@ -32,18 +34,18 @@ class GenericPageTest(TestCase):
         )
 
 
-class PageTest(TestCase):
+class TextPageTest(TestCase):
 
     def test_text_content(self):
-        first = Page(1, 'one\x0ctwo\x0cthree\x0cfour\x0cfive\x0csix\x0cseven\x0ceight')
-        second = Page(4, '')
+        first = TextPage(1, 'one\x0ctwo\x0cthree\x0cfour\x0cfive\x0csix\x0cseven\x0ceight')
+        second = TextPage(4, '')
         first.next_page = second
         self.assertEqual(
             first.text_content,
             'two\nthree\nfour'
         )
 
-        first = Page(1, 'one\x0ctwo\x0cthree\x0cfour\x0cfive\x0csix\x0cseven\x0ceight')
+        first = TextPage(1, 'one\x0ctwo\x0cthree\x0cfour\x0cfive\x0csix\x0cseven\x0ceight')
         first.next_page = None
         self.assertEqual(
             first.text_content,
@@ -51,45 +53,45 @@ class PageTest(TestCase):
         )
 
     def test_page_no(self):
-        first = Page(0, 'blah blah blah')
+        first = TextPage(0, 'blah blah blah')
         self.assertEqual(
             first.page_no,
             None
         )
 
-        first = Page(0, '2\nblah blah blah')
+        first = TextPage(0, '2\nblah blah blah')
         self.assertEqual(
             first.page_no,
             2
         )
 
-        first = Page(0, 'two\nblah blah blah')
+        first = TextPage(0, 'two\nblah blah blah')
         self.assertEqual(
             first.page_no,
             2
         )
 
-        first = Page(0, 'blah\nblah blah blah\n2')
+        first = TextPage(0, 'blah\nblah blah blah\n2')
         self.assertEqual(
             first.page_no,
             2
         )
 
-        first = Page(0, 'blah\nblah blah blah\ntwo')
+        first = TextPage(0, 'blah\nblah blah blah\ntwo')
         self.assertEqual(
             first.page_no,
             2
         )
 
     def test_html_content(self):
-        first = Page(0, 'blah\n\nblah blah blah')
+        first = TextPage(0, 'blah\n\nblah blah blah')
         self.assertEqual(
             first.html_content,
             '<p>blah</p><p>blah blah blah</p>'
         )
 
     def test_epub_content(self):
-        first = Page(0, 'blah\n\nblah blah blah')
+        first = TextPage(0, 'blah\n\nblah blah blah')
         self.assertEqual(
             first.epub_content.content,
             '<p>blah</p><p>blah blah blah</p><span xmlns:epub="http://www.idpf.org/2007/ops" epub:type="pagebreak" title="p_0" id="p_0"/>'
