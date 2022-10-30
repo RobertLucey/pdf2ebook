@@ -81,8 +81,7 @@ class PDF:
     def load_text(self):
         self.text_file = self.pdf_path + ".txt"
 
-        if not os.path.exists(self.text_file):
-            os.system(f"pdftotext '{self.pdf_path}' '{self.text_file}'")
+        os.system(f"pdftotext '{self.pdf_path}' '{self.text_file}'")
 
         if not os.path.exists(self.text_file):
             logger.error("Could not convert pdf to text: %s" % (self.text_file))
@@ -93,8 +92,7 @@ class PDF:
     def load_html(self):
         self.html_file = self.pdf_path.replace(".pdf", "s.html")
 
-        if not os.path.exists(self.html_file):
-            os.system(f"pdftohtml '{self.pdf_path}'")
+        os.system(f"pdftohtml '{self.pdf_path}'")
 
         if not os.path.exists(self.html_file):
             logger.error("Could not convert pdf to html: %s" % (self.html_file))
