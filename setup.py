@@ -13,7 +13,7 @@ INSTALL_REQUIRES = (
 
 setup(
     name='pdf2ebook',
-    version='1.6.0',
+    version='1.7.0',
     python_requires='>=3.6',
     description='PDF to ebook',
     long_description='PDF to ebook',
