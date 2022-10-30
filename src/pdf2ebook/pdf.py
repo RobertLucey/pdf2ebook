@@ -92,7 +92,7 @@ class PDF:
     def load_html(self):
         self.html_file = self.pdf_path.replace(".pdf", "s.html")
 
-        os.system(f"pdftohtml '{self.pdf_path}'")
+        os.system(f"pdftohtml -q '{self.pdf_path}'")
 
         if not os.path.exists(self.html_file):
             logger.error("Could not convert pdf to html: %s" % (self.html_file))
