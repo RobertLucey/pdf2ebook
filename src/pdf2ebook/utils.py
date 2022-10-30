@@ -1,11 +1,6 @@
 from itertools import islice
 
 
-def clean_string(string):
-    string = string.replace("\x0c", "")
-    return string.encode("ascii", errors="ignore").decode().strip()
-
-
 def window(sequence, window_size=2):
     """
     Returns a sliding window (of width n) over data from the iterable
