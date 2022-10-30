@@ -20,6 +20,12 @@ def main():
     )
     args = parser.parse_args()
 
+    if not args.force_text:
+        args.force_text = None
+
+    if not args.force_html:
+        args.force_html = None
+
     pdf = PDF(path=args.in_file, use_html=args.force_html, use_text=args.force_text)
     pdf.to_epub(path=args.out_file)
 
