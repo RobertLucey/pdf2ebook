@@ -1,3 +1,4 @@
+import re
 from itertools import islice
 
 
@@ -12,3 +13,8 @@ def window(sequence, window_size=2):
     for elem in seq_iterator:
         result = result[1:] + (elem,)
         yield result
+
+
+def remove_page_no(content):
+    # bit risky, should be told if to remove from start or end
+    return re.sub("(^\d+)|(\d+$)", "", content)
