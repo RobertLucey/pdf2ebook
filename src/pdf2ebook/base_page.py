@@ -1,5 +1,6 @@
 import langdetect
 from cached_property import cached_property
+from boltons.iterutils import strip
 
 
 class BasePage:
@@ -17,4 +18,4 @@ class BasePage:
         content = []
         for line in self.text_content.split("\n"):
             content.append(line.strip())
-        return "\n".join(content)
+        return "\n".join(strip(content, ''))

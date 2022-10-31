@@ -8,7 +8,8 @@ INSTALL_REQUIRES = (
     'ebooklib',
     'bs4',
     'langdetect',
-    'cached_property'
+    'cached_property',
+    'boltons'
 )
 
 setup(

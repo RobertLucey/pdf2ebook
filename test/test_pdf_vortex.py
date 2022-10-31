@@ -14,10 +14,41 @@ class VortexPDFTest(TestCase):
     def test_pages_content(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
-        self.assertTrue(
-            pdf.pages._data[0].text_content.startswith(
-                'INTRODUCING'
-            )
+
+        self.assertEqual(
+            pdf.pages._data[0].text_content,
+            '''INTRODUCING "Storm" Cloud, who, through tragedy, is destined to become the most noted figure in the
+galaxy—
+
+The Vortex Blaster
+***
+
+E. E. SMITH, Ph.D.
+Author of "The Skylark,""Skylark Three,""The Skylark of Valeron," the Lensman stories, etc.
+Comet
+Published in July 1941
+epubBooks.com
+
+'''
+        )
+
+    def test_pages_cleaned_content(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+
+        self.assertEquals(
+            pdf.pages._data[0].cleaned_text_content,
+            '''INTRODUCING "Storm" Cloud, who, through tragedy, is destined to become the most noted figure in the
+galaxy—
+
+The Vortex Blaster
+***
+
+E. E. SMITH, Ph.D.
+Author of "The Skylark,""Skylark Three,""The Skylark of Valeron," the Lensman stories, etc.
+Comet
+Published in July 1941
+epubBooks.com'''
         )
 
     def test_pages_context(self):

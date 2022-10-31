@@ -15,10 +15,38 @@ class RoomWithAViewPDFTest(TestCase):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
 
-        self.assertTrue(
-            pdf.pages._data[0].text_content.startswith(
-                'A ROOM'
-            )
+        self.assertEquals(
+            pdf.pages._data[0].text_content,
+            """A ROOM WITH A VIEW 
+  
+by E. M. Forster 
+  
+ 
+ 
+  
+ 
+This free e-book was created and is distributed not-for-profit 
+by Candida Martinelli of 
+Candida Martinelli’s Italophile Site"""
+        )
+
+    def test_pages_cleaned_content(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+
+        self.assertEquals(
+            pdf.pages._data[0].cleaned_text_content,
+            """A ROOM WITH A VIEW
+
+by E. M. Forster
+
+
+
+
+
+This free e-book was created and is distributed not-for-profit
+by Candida Martinelli of
+Candida Martinelli’s Italophile Site"""
         )
 
     def test_pages_context(self):
