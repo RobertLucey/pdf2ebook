@@ -11,6 +11,14 @@ class RoomWithAViewPDFTest(TestCase):
     EPUB_NAME = 'test_room_with_a_view.epub'
     EXPECTED_PAGES = 151
 
+    def test_page_number_position(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        self.assertEquals(
+            pdf.pages.page_number_position,
+            'bottom'
+        )
+
     def test_pages_content(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()

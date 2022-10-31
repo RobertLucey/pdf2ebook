@@ -11,6 +11,14 @@ class AlicePDFTest(TestCase):
     EPUB_NAME = 'test_alice.epub'
     EXPECTED_PAGES = 21
 
+    def test_page_number_position(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        self.assertEquals(
+            pdf.pages.page_number_position,
+            'top'
+        )
+
     def test_pages_content(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
