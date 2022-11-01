@@ -43,7 +43,9 @@ class PDF:
 
         # TODO: with ISBN can also use for title / author if network
 
-        book.set_identifier(self.get_isbn())
+        isbn = self.get_isbn()
+        if isbn:
+            book.set_identifier(self.get_isbn())
         book.set_title(os.path.splitext(os.path.basename(self.pdf_path))[0])
         book.add_author("")
 
