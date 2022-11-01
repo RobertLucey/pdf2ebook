@@ -1,3 +1,5 @@
+import difflib
+
 from ebooklib import epub
 from ebooklib.utils import create_pagebreak
 
@@ -11,11 +13,18 @@ class TextPage(BasePage):
         self.next_page = None
         self.content = content
 
+        if self.next_page is not None:
+            self.raw_content = "\n".join(
+                self.content.split("\x0c")[self.idx : self.next_page.idx]
+            )
+        else:
+            self.raw_content = "\n".join(self.content.split("\x0c")[self.idx :])
+
+        super(TextPage, self).__init__()
+
     @property
     def text_content(self):
-        if self.next_page is not None:
-            return "\n".join(self.content.split("\x0c")[self.idx : self.next_page.idx])
-        return "\n".join(self.content.split("\x0c")[self.idx :])
+        return self.raw_content
 
     @property
     def page_no(self):
@@ -69,3 +78,47 @@ class TextPage(BasePage):
         epub_page.content = self.html_content
         epub_page.content += create_pagebreak(f"p_{self.idx}")
         return epub_page
+
+    def remove_page_number(self):
+        self.raw_content = self.text_content_without_page_no
+
+    def remove_header(self, header):
+        if not header:
+            return
+        content = []
+        for idx, line in enumerate(self.text_content.split("\n")):
+            if idx < 5:
+                if difflib.SequenceMatcher(None, line, header).ratio() > 0.8:
+                    pass
+                else:
+                    content.append(line)
+            else:
+                content.append(line)
+
+        if content:
+            self.raw_content = "\n".join(content)
+
+    def remove_footer(self, footer):
+        if not footer:
+            return
+        content = []
+        for idx, line in enumerate(reversed(self.text_content.split("\n"))):
+            if idx < 5:
+                if difflib.SequenceMatcher(None, line, footer).ratio() > 0.8:
+                    pass
+                else:
+                    content.append(line)
+            else:
+                content.append(line)
+
+        if content:
+            self.raw_content = "\n".join(reversed(content))
+
+    def set_next_page(self, next_page):
+        self.next_page = next_page
+        if self.next_page is not None:
+            self.raw_content = "\n".join(
+                self.content.split("\x0c")[self.idx : self.next_page.idx]
+            )
+        else:
+            self.raw_content = "\n".join(self.content.split("\x0c")[self.idx :])

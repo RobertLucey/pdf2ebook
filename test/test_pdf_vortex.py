@@ -11,11 +11,28 @@ class VortexPDFTest(TestCase):
     EPUB_NAME = 'test_vortex.epub'
     EXPECTED_PAGES = 16
 
-    def test_page_number_position(self):
+    def test_detect_footer(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         self.assertEquals(
-            pdf.pages.page_number_position,
+            pdf.pages.detect_footer(),
+            None
+        )
+
+    def test_detect_header(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        self.assertEquals(
+            pdf.pages.detect_header(),
+            None
+        )
+
+    def test_page_number_position(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        pdf.pages.set_page_number_position()
+        self.assertEquals(
+            pdf.pages[0].page_number_position,
             None
         )
 

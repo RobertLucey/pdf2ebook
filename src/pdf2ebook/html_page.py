@@ -1,3 +1,5 @@
+import re
+import difflib
 import os
 from io import StringIO
 import shutil
@@ -24,6 +26,8 @@ class HTMLPage(BasePage):
             logger.warning("No hr tags found, expecting a single page document")
 
         self.content = str(soup)
+
+        super(HTMLPage, self).__init__()
 
     @property
     def images(self):
@@ -77,7 +81,6 @@ class HTMLPage(BasePage):
 
     @property
     def epub_content(self):
-
         # need a different content that strips headers and footers
         epub_page = epub.EpubHtml(
             title=f"title_{self.idx}",
@@ -88,3 +91,123 @@ class HTMLPage(BasePage):
         epub_page.content = self.html_content
         epub_page.content += create_pagebreak(f"p_{self.idx}")
         return epub_page
+
+    def remove_header(self, header):
+        if not header:
+            return
+        # might need to remove tags
+        soup = bs4.BeautifulSoup(StringIO(self.content), "html.parser")
+        lines = str(soup).split("\n")
+        content = []
+        collect = False
+        for line in lines:
+            if collect:
+                content.append(line)
+            else:
+                soup_line = bs4.BeautifulSoup(StringIO(line), "html.parser")
+                if (
+                    difflib.SequenceMatcher(
+                        None, soup_line.text.strip(), header
+                    ).ratio()
+                    > 0.8
+                ):
+                    collect = True
+        if content:
+            self.content = "\n".join(content)
+
+    def remove_footer(self, footer):
+        if not footer:
+            return
+        # might need to remove tags
+        soup = bs4.BeautifulSoup(StringIO(self.content), "html.parser")
+        lines = str(soup).split("\n")
+        content = []
+        collect = False
+        for line in reversed(lines):
+            if collect:
+                content.append(line)
+            else:
+                soup_line = bs4.BeautifulSoup(StringIO(line), "html.parser")
+                if (
+                    difflib.SequenceMatcher(
+                        None, soup_line.text.strip(), footer
+                    ).ratio()
+                    > 0.8
+                ):
+                    collect = True
+        if content:
+            self.content = "\n".join(reversed(content))
+
+    def remove_page_number(self):
+        if self.included_page_no is None:
+            return
+
+        # find the number from text and remove from html
+        soup = bs4.BeautifulSoup(StringIO(self.content), "html.parser")
+        lines = str(soup).split("\n")
+
+        if self.page_number_position == "top":
+            content = []
+            collect = False
+            for line in lines:
+                if collect:
+                    content.append(line)
+                else:
+                    text_line = bs4.BeautifulSoup(
+                        StringIO(line), "html.parser"
+                    ).text.strip()
+                    if text_line.startswith(self.included_page_no):
+                        content.append(
+                            re.sub("(^\d+)", "", text_line)
+                        )  # FIXME: this removes html elements
+                        collect = True
+            if content:
+                self.content = "\n".join(content)
+        elif self.page_number_position == "bottom":
+            content = []
+            collect = False
+            for line in reversed(lines):
+                if collect:
+                    content.append(line)
+                else:
+                    text_line = bs4.BeautifulSoup(
+                        StringIO(line), "html.parser"
+                    ).text.strip()
+                    if text_line.startswith(self.included_page_no):
+                        content.append(
+                            re.sub("(^\d+)", "", text_line)
+                        )  # FIXME: this removes html elements
+                        collect = True
+            if content:
+                self.content = "\n".join(reversed(content))
+
+        self.strip_whitespace()
+
+    def strip_whitespace(self):
+        soup = bs4.BeautifulSoup(StringIO(self.content), "html.parser")
+        lines = str(soup).split("\n")
+        content = []
+        collect = False
+        for line in lines:
+            if collect:
+                content.append(line)
+            else:
+                soup_line = bs4.BeautifulSoup(StringIO(line), "html.parser")
+                if soup_line.text.strip() == "":
+                    collect = True
+        if content:
+            self.content = "\n".join(content)
+
+        soup = bs4.BeautifulSoup(StringIO(self.content), "html.parser")
+        lines = str(soup).split("\n")
+        content = []
+        collect = False
+        for line in reversed(lines):
+            if collect:
+                content.append(line)
+            else:
+                soup_line = bs4.BeautifulSoup(StringIO(line), "html.parser")
+                if soup_line.text.strip() == "":
+                    collect = True
+        if content:
+            self.content = "\n".join(reversed(content))

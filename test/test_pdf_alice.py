@@ -11,19 +11,60 @@ class AlicePDFTest(TestCase):
     EPUB_NAME = 'test_alice.epub'
     EXPECTED_PAGES = 21
 
-    def test_page_number_position(self):
+    def test_detect_footer(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         self.assertEquals(
-            pdf.pages.page_number_position,
+            pdf.pages.detect_footer(),
+            None
+        )
+
+    def test_detect_header(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        self.assertEquals(
+            pdf.pages.detect_header(),
+            None
+        )
+
+    def test_remove_page_number(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        pdf.pages.set_page_number_position()
+        pdf.pages[0].remove_page_number()
+        self.assertEquals(
+            pdf.pages[0].content,
+            '''<b>Alice's Adventures in Wonderland </b><br/>
+<b>by </b><br/>
+<b>Lewis Carroll </b><br/>
+ <br/>
+<b>CHAPTER I</b> <br/>
+  <br/>
+<i><b>DOWN THE RABBIT-HOLE</b></i> <br/>
+    <br/>
+ALICE was beginning to get very tired of sitting by her sister on the bank and of having <br/>
+nothing to do: once or twice she had peeped into the book her sister was reading, but it <br/>
+had no pictures or conversations in it, "and what is the use of a book," thought Alice, <br/>
+"without pictures or conversations?'   <br/>
+So she was considering, in her own mind (as well as she could, for the hot day made her <br/>
+feel very sleepy and stupid), whether the pleasure of making a daisy-chain would be <br/>'''
+        )
+
+    def test_page_number_position(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        pdf.pages.set_page_number_position()
+        self.assertEquals(
+            pdf.pages[0].page_number_position,
             'top'
         )
 
     def test_page_without_page_no(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
+        pdf.pages.set_page_number_position()
         self.assertEquals(
-            pdf.pages[0].get_text_content_without_page_no(pdf.pages.page_number_position),
+            pdf.pages[0].text_content_without_page_no,
             '''Alice's Adventures in Wonderland
 by
 Lewis Carroll

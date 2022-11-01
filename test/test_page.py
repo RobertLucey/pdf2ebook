@@ -36,17 +36,35 @@ class BasePageTest(TestCase):
 
 class TextPageTest(TestCase):
 
+    def test_remove_footer(self):
+        page = TextPage(0, 'something blah blah\x0cother stuff\x0cFooter')
+        page.remove_header('Footer')
+
+        self.assertEqual(
+            page.text_content,
+            'something blah blah\nother stuff'
+        )
+
+    def test_remove_header(self):
+        page = TextPage(0, 'Header\x0csomething blah blah\x0cother stuff')
+        page.remove_header('Header')
+
+        self.assertEqual(
+            page.text_content,
+            'something blah blah\nother stuff'
+        )
+
     def test_text_content(self):
         first = TextPage(1, 'one\x0ctwo\x0cthree\x0cfour\x0cfive\x0csix\x0cseven\x0ceight')
         second = TextPage(4, '')
-        first.next_page = second
+        first.set_next_page(second)
         self.assertEqual(
             first.text_content,
             'two\nthree\nfour'
         )
 
         first = TextPage(1, 'one\x0ctwo\x0cthree\x0cfour\x0cfive\x0csix\x0cseven\x0ceight')
-        first.next_page = None
+        first.set_next_page(None)
         self.assertEqual(
             first.text_content,
             'two\nthree\nfour\nfive\nsix\nseven\neight'
@@ -130,4 +148,20 @@ class HTMLPageTest(TestCase):
         self.assertEqual(
             page.html_content,
             '<p>something something</p><img src="test_images.png"/>'
+        )
+
+    def test_remove_header(self):
+        page = HTMLPage(0, '<p>something</p>\nBlah blah</br>')
+        page.remove_header('something')
+        self.assertEquals(
+            page.text_content,
+            'Blah blah'
+        )
+
+    def test_remove_footer(self):
+        page = HTMLPage(0, '<p>something</p>\nBlah blah</br>')
+        page.remove_footer('Blah blah')
+        self.assertEquals(
+            page.text_content,
+            'something'
         )

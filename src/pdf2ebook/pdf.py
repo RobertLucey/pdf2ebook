@@ -39,6 +39,8 @@ class PDF:
 
         book.add_author("")
 
+        self.pages.set_page_number_position()
+
         contents = []
         for page in self.pages:
             contents.append(page)
@@ -47,6 +49,14 @@ class PDF:
             for page in contents:
                 for image in page.images:
                     book.add_item(image)
+
+        for i in range(10):  # FIXME: hacky
+            header = self.pages.detect_header()
+            footer = self.pages.detect_footer()
+            for page in contents:
+                page.remove_page_number()
+                page.remove_header(header)
+                page.remove_footer(footer)
 
         for page in contents:
             if (

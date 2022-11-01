@@ -11,11 +11,28 @@ class RoomWithAViewPDFTest(TestCase):
     EPUB_NAME = 'test_room_with_a_view.epub'
     EXPECTED_PAGES = 151
 
-    def test_page_number_position(self):
+    def test_detect_footer(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         self.assertEquals(
-            pdf.pages.page_number_position,
+            pdf.pages.detect_footer(),
+            None
+        )
+
+    def test_detect_header(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        self.assertEquals(
+            pdf.pages.detect_header(),
+            None
+        )
+
+    def test_page_number_position(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        pdf.pages.set_page_number_position()
+        self.assertEquals(
+            pdf.pages[0].page_number_position,
             'bottom'
         )
 
