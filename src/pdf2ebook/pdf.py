@@ -1,4 +1,5 @@
 import os
+import re
 from io import StringIO
 
 import bs4
@@ -10,7 +11,7 @@ from pdf2ebook import logger
 from pdf2ebook.text_page import TextPage
 from pdf2ebook.html_page import HTMLPage
 from pdf2ebook.pages import Pages
-from pdf2ebook.utils import window
+from pdf2ebook.utils import window, get_isbn
 
 
 class PDF:
@@ -26,6 +27,12 @@ class PDF:
 
         self.loaded = False
 
+    def get_isbn(self):
+        for page in self.pages:
+            isbn = get_isbn(page.cleaned_text_content)
+            if isbn:
+                return isbn
+
     def to_epub(self, path=None):
         self.load()
 
@@ -34,7 +41,9 @@ class PDF:
 
         book = epub.EpubBook()
 
-        # TODO: regex for ISBN (can also use for title / author if network)
+        # TODO: with ISBN can also use for title / author if network
+
+        book.set_identifier(self.get_isbn())
         book.set_title(os.path.splitext(os.path.basename(self.pdf_path))[0])
         book.add_author("")
 

@@ -1,6 +1,15 @@
 import re
 from itertools import islice
 
+ISBN_REGEX = r"978[0-9\-]+"
+ISBN_PATTERN = re.compile(ISBN_REGEX, re.UNICODE)
+
+
+def get_isbn(text):
+    matches = ISBN_PATTERN.findall(text)
+    if matches:
+        return matches[0]
+
 
 def window(sequence, window_size=2):
     """
