@@ -41,6 +41,34 @@ class PDF:
                 return meta["Authors"]
         return []
 
+    def get_title(self):
+        isbn = self.get_isbn()
+        if isbn:
+            meta = isbnlib.meta(isbn)
+            if meta.get("Title", None):
+                return meta["Title"]
+
+    def set_title(self, book):
+        title = self.get_title()
+        if title:
+            book.set_title(title)
+        else:
+            book.set_title(os.path.splitext(os.path.basename(self.pdf_path))[0])
+        return book
+
+    def set_authors(self, book):
+        isbn = self.get_isbn()
+        if isbn:
+            for author in self.get_authors():
+                book.add_author(author)
+        return book
+
+    def set_identifier(self, book):
+        isbn = self.get_isbn()
+        if isbn:
+            book.set_identifier(isbn)
+        return book
+
     def to_epub(self, path=None):
         self.load()
 
@@ -51,12 +79,9 @@ class PDF:
 
         # TODO: with ISBN can also use for title / author if network
 
-        isbn = self.get_isbn()
-        if isbn:
-            book.set_identifier(isbn)
-            for author in self.get_authors():
-                book.add_author(author)
-        book.set_title(os.path.splitext(os.path.basename(self.pdf_path))[0])
+        book = self.set_identifier(book)
+        book = self.set_authors(book)
+        book = self.set_title(book)
 
         contents = []
         for page in self.pages:
