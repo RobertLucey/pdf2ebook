@@ -4,6 +4,7 @@ from setuptools import (
 )
 
 INSTALL_REQUIRES = (
+    'isbnlib',
     'pdf2text',
     'ebooklib',
     'bs4',

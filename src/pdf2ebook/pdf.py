@@ -1,7 +1,7 @@
 import os
-import re
 from io import StringIO
 
+import isbnlib
 import bs4
 from ebooklib import epub
 from ebooklib.plugins import standard
@@ -33,6 +33,14 @@ class PDF:
             if isbn:
                 return isbn
 
+    def get_authors(self):
+        isbn = self.get_isbn()
+        if isbn:
+            meta = isbnlib.meta(isbn)
+            if meta.get("Authors", None):
+                return meta["Authors"]
+        return []
+
     def to_epub(self, path=None):
         self.load()
 
@@ -45,9 +53,10 @@ class PDF:
 
         isbn = self.get_isbn()
         if isbn:
-            book.set_identifier(self.get_isbn())
+            book.set_identifier(isbn)
+            for author in self.get_authors():
+                book.add_author(author)
         book.set_title(os.path.splitext(os.path.basename(self.pdf_path))[0])
-        book.add_author("")
 
         contents = []
         for page in self.pages:
