@@ -34,12 +34,9 @@ class PDF:
 
         book = epub.EpubBook()
 
-        # add metadata
+        # TODO: regex for ISBN (can also use for title / author if network)
         book.set_title(os.path.splitext(os.path.basename(self.pdf_path))[0])
-
         book.add_author("")
-
-        self.pages.set_page_number_position()
 
         contents = []
         for page in self.pages:
@@ -51,6 +48,7 @@ class PDF:
                     book.add_item(image)
 
         for i in range(10):  # FIXME: hacky
+            self.pages.set_page_number_position()
             header = self.pages.detect_header()
             footer = self.pages.detect_footer()
             for page in contents:
@@ -70,6 +68,7 @@ class PDF:
                 is None
             ):
                 continue
+            page.strip_whitespace()
             book.add_item(page.epub_content)
 
         book.add_item(epub.EpubNcx())

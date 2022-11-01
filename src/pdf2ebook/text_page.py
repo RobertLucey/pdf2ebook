@@ -1,5 +1,7 @@
 import difflib
 
+from boltons.iterutils import strip
+
 from ebooklib import epub
 from ebooklib.utils import create_pagebreak
 
@@ -122,3 +124,6 @@ class TextPage(BasePage):
             )
         else:
             self.raw_content = "\n".join(self.content.split("\x0c")[self.idx :])
+
+    def strip_whitespace(self):
+        self.raw_content = "\n".join(strip(self.raw_content.split("\n"), ""))
