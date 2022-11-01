@@ -28,6 +28,7 @@ class PDF:
         self.loaded = False
 
     def get_isbn(self):
+        # TODO: also attempt to get isbn from isbnlib.isbn_from_words
         for page in self.pages:
             isbn = get_isbn(page.cleaned_text_content)
             if isbn:
