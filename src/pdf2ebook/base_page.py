@@ -22,7 +22,6 @@ class BasePage:
 
     @property
     def cleaned_text_content(self):
-        # FIXME: remove newlines at start and end
         content = []
         for line in self.text_content.split("\n"):
             content.append(line.strip())
