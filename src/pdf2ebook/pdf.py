@@ -31,7 +31,12 @@ class PDF:
         for page in self.pages:
             isbn = get_isbn(page.cleaned_text_content)
             if isbn:
-                return isbn
+                try:
+                    isbnlib.meta(isbn)
+                except isbnlib._exceptions.NotValidISBNError:
+                    logger.warning(f"Not a valid ISBN: {isbn}")
+                else:
+                    return isbn
 
     def get_authors(self):
         isbn = self.get_isbn()
