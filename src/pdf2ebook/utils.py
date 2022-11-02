@@ -34,7 +34,7 @@ def window(sequence, window_size=2):
 
 def remove_page_no(content):
     # bit risky, should be told if to remove from start or end
-    return re.sub("(^\d+)|(\d+$)", "", content)
+    return re.sub("(^\d+)|(\d+$)", "", content).strip()
 
 
 def isbns_from_words(words):
