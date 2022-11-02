@@ -28,7 +28,7 @@ class UtilsTest(TestCase):
 
     def test_isbns_from_words(self):
         isbns = isbns_from_words("The old man and the sea")
-        self.assertIn('9780099908401', isbns)
+        self.assertGreater(len(isbns), 1)
 
     def test_remove_page_no(self):
         self.assertEquals(remove_page_no("123 something 123"), "something")
