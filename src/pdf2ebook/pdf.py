@@ -144,6 +144,28 @@ class PDF:
             if thumbnail:
                 return thumbnail
 
+    def get_publisher(self):
+        isbn = self.get_isbn()
+        if isbn:
+            meta = isbnlib.meta(isbn)
+            if meta.get("Publisher", None):
+                return meta["Publisher"]
+
+    def set_publisher(self, book):
+        book.set_unique_metadata("DC", "publisher", self.get_publisher())
+        return book
+
+    def get_published_date(self):
+        isbn = self.get_isbn()
+        if isbn:
+            meta = isbnlib.meta(isbn)
+            if meta.get("Year", None):
+                return meta["Year"]
+
+    def set_published_date(self, book):
+        book.set_unique_metadata("DC", "date", self.get_published_date())
+        return book
+
     def to_epub(self, path=None):
         self.load()
 
@@ -197,6 +219,8 @@ class PDF:
         book = self.set_identifier(book)
         book = self.set_authors(book)
         book = self.set_title(book)
+        book = self.set_published_date(book)
+        book = self.set_publisher(book)
 
         if self.get_thumbnail_url():
             # NOTE: https://github.com/aerkalov/ebooklib/issues/220
