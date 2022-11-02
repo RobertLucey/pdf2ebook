@@ -3,6 +3,7 @@ import re
 import difflib
 import unicodedata
 from io import StringIO
+import urllib.request
 
 import isbnlib
 import bs4
@@ -51,6 +52,7 @@ class PDF:
         for idx, line in enumerate(clean_content.split("\n")):
             if line.startswith("by:") or line.startswith("by ") or line == "by":
                 found_idx = idx
+
         if found_idx is not None:
             possible_title = "\n".join(clean_content.split("\n")[:found_idx]).strip()
             logger.debug(f"Guessing the title from page content is: {possible_title}")
@@ -195,6 +197,13 @@ class PDF:
         book = self.set_identifier(book)
         book = self.set_authors(book)
         book = self.set_title(book)
+
+        if self.get_thumbnail_url():
+            # NOTE: https://github.com/aerkalov/ebooklib/issues/220
+            urllib.request.urlretrieve(
+                self.get_thumbnail_url(),
+                f"/tmp/{os.path.splitext(os.path.basename(self.pdf_path))[0]}___cover.jpg",
+            )
 
         opts = {"plugins": [standard.SyntaxPlugin()]}
         epub.write_epub(path, book, opts)
