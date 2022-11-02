@@ -1,15 +1,41 @@
 import os
 
-from unittest import TestCase
+from unittest import TestCase, skip
 
 from pdf2ebook.pdf import PDF
 
 
 class VortexPDFTest(TestCase):
 
-    PDF_PATH = "test/resources/vortex.pdf"
+    PDF_PATH = "test/resources/vortex_blaster.pdf"
     EPUB_NAME = "test_vortex.epub"
     EXPECTED_PAGES = 16
+
+    @skip("Need to get isbn")
+    def test_get_thumbnail_url(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+        self.assertIsNotNone(pdf.get_thumbnail_url())
+
+    @skip("Need to find author name and check before it")
+    def test_get_expected_title(self):
+        pdf = PDF(path=self.PDF_PATH)
+        pdf.load()
+
+        contents = []
+        for page in pdf.pages:
+            contents.append(page)
+
+        for i in range(10):  # FIXME: hacky
+            pdf.pages.set_page_number_position()
+            header = pdf.pages.detect_header()
+            footer = pdf.pages.detect_footer()
+            for page in contents:
+                page.remove_page_number()
+                page.remove_header(header)
+                page.remove_footer(footer)
+
+        self.assertEquals(pdf.get_expected_title(), "the vortex blaster")
 
     def test_detect_footer(self):
         pdf = PDF(path=self.PDF_PATH)

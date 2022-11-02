@@ -1,4 +1,7 @@
 import os
+import re
+import difflib
+import unicodedata
 from io import StringIO
 
 import isbnlib
@@ -11,24 +14,53 @@ from pdf2ebook import logger
 from pdf2ebook.text_page import TextPage
 from pdf2ebook.html_page import HTMLPage
 from pdf2ebook.pages import Pages
-from pdf2ebook.utils import window, get_isbn
+from pdf2ebook.utils import window, get_isbn, isbns_from_words
 
 
 class PDF:
     def __init__(self, *args, **kwargs):
         self.pdf_path = kwargs["path"]
-        self.text_content = None
-
+        self._title = kwargs.get("title", None)
         self._use_text = kwargs.get("use_text", None)
         self._use_html = kwargs.get("use_html", None)
+
+        self.text_content = None
 
         self.text_file = None
         self.html_file = None
 
         self.loaded = False
 
+    def get_expected_title(self):
+        if self._title:
+            return self._title
+
+        # Assert page no removed first
+
+        # Maybe check the first line of the second page too
+
+        filename = os.path.splitext(os.path.basename(self.pdf_path))[0]
+        filename = filename.replace("_", " ").lower()
+        filename_title = filename
+        # if by... remove by... to just get the title
+        filename_title = re.sub("([- ]by[-: ].*)", "", filename_title)
+
+        content_title = ""
+        clean_content = self.pages[0].cleaned_text_content.lower()
+        found_idx = None
+        for idx, line in enumerate(clean_content.split("\n")):
+            if line.startswith("by:") or line.startswith("by ") or line == "by":
+                found_idx = idx
+        if found_idx is not None:
+            possible_title = "\n".join(clean_content.split("\n")[:found_idx]).strip()
+            logger.debug(f"Guessing the title from page content is: {possible_title}")
+            content_title = unicodedata.normalize("NFKD", possible_title.strip())
+
+        if difflib.SequenceMatcher(None, filename_title, content_title).ratio() > 0.4:
+            logger.debug("filename_title and content_title close enough")
+            return content_title
+
     def get_isbn(self):
-        # TODO: also attempt to get isbn from isbnlib.isbn_from_words
         for page in self.pages:
             isbn = get_isbn(page.cleaned_text_content)
             if isbn:
@@ -39,6 +71,32 @@ class PDF:
                 else:
                     return isbn
 
+        expected_title = self.get_expected_title()
+        if expected_title:
+            logger.info(f"Guessing the isbn from title: {expected_title}")
+            return isbnlib.isbn_from_words(expected_title)
+
+    def get_isbns(self):
+
+        isbns = []
+
+        for page in self.pages:
+            isbn = get_isbn(page.cleaned_text_content)
+            if isbn:
+                try:
+                    isbnlib.meta(isbn)
+                except isbnlib._exceptions.NotValidISBNError:
+                    logger.warning(f"Not a valid ISBN: {isbn}")
+                else:
+                    isbns.append(isbn)
+
+        expected_title = self.get_expected_title()
+        if expected_title:
+            logger.info(f"Guessing the isbn from title: {expected_title}")
+            isbns.extend(isbns_from_words(expected_title))
+
+        return list(set(isbns))
+
     def get_authors(self):
         isbn = self.get_isbn()
         if isbn:
@@ -48,6 +106,9 @@ class PDF:
         return []
 
     def get_title(self):
+        if self._title:
+            return self._title
+
         isbn = self.get_isbn()
         if isbn:
             meta = isbnlib.meta(isbn)
@@ -75,6 +136,12 @@ class PDF:
             book.set_identifier(isbn)
         return book
 
+    def get_thumbnail_url(self):
+        for isbn in self.get_isbns():
+            thumbnail = isbnlib.cover(isbn).get("thumbnail", None)
+            if thumbnail:
+                return thumbnail
+
     def to_epub(self, path=None):
         self.load()
 
@@ -83,18 +150,8 @@ class PDF:
 
         book = epub.EpubBook()
 
-        # TODO: with ISBN can also use for title / author if network
-
-        book = self.set_identifier(book)
-        book = self.set_authors(book)
-        book = self.set_title(book)
-
-        contents = []
-        for page in self.pages:
-            contents.append(page)
-
         if self.use_html:
-            for page in contents:
+            for page in self.pages:
                 for image in page.images:
                     book.add_item(image)
 
@@ -102,12 +159,12 @@ class PDF:
             self.pages.set_page_number_position()
             header = self.pages.detect_header()
             footer = self.pages.detect_footer()
-            for page in contents:
+            for page in self.pages:
                 page.remove_page_number()
                 page.remove_header(header)
                 page.remove_footer(footer)
 
-        for page in contents:
+        for page in self.pages:
             if (
                 bs4.BeautifulSoup(
                     StringIO(page.epub_content.content), "html.parser"
@@ -125,7 +182,7 @@ class PDF:
         book.add_item(epub.EpubNcx())
         book.add_item(epub.EpubNav())
 
-        book.spine = ["nav"] + [c.epub_content for c in contents]
+        book.spine = ["nav"] + [c.epub_content for c in self.pages]
 
         langs = [page.lang for page in self.pages]
         lang = max(set(langs), key=langs.count)
@@ -134,6 +191,10 @@ class PDF:
         else:
             logger.debug(f"Language detected: {lang}")
             book.set_language(lang)
+
+        book = self.set_identifier(book)
+        book = self.set_authors(book)
+        book = self.set_title(book)
 
         opts = {"plugins": [standard.SyntaxPlugin()]}
         epub.write_epub(path, book, opts)

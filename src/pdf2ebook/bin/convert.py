@@ -18,6 +18,12 @@ def main():
         action="store_true",
         dest="force_text",
     )
+    parser.add_argument(
+        "--title",
+        type=str,
+        dest="title",
+        help="title of the book to get metadata from the internet / set metadata on the ebook",
+    )
     args = parser.parse_args()
 
     if not args.force_text:
@@ -26,7 +32,12 @@ def main():
     if not args.force_html:
         args.force_html = None
 
-    pdf = PDF(path=args.in_file, use_html=args.force_html, use_text=args.force_text)
+    pdf = PDF(
+        path=args.in_file,
+        use_html=args.force_html,
+        use_text=args.force_text,
+        title=args.title,
+    )
     pdf.to_epub(path=args.out_file)
 
 
