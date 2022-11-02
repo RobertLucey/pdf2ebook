@@ -30,6 +30,10 @@ class HTMLPage(BasePage):
         super(HTMLPage, self).__init__()
 
     @property
+    def content_hash(self):
+        return hash(self.content)
+
+    @property
     def images(self):
         soup = bs4.BeautifulSoup(StringIO(self.content), "html.parser")
         imgs = soup.find_all("img")

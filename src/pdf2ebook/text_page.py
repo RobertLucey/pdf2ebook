@@ -25,6 +25,10 @@ class TextPage(BasePage):
         super(TextPage, self).__init__()
 
     @property
+    def content_hash(self):
+        return hash(self.text_content)
+
+    @property
     def text_content(self):
         return self.raw_content
 

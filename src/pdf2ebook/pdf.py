@@ -32,6 +32,17 @@ class PDF:
 
         self.loaded = False
 
+    @property
+    def content_hash(self):
+        return hash(sum([page.content_hash for page in self.pages]))
+
+    @property
+    def isbn_meta(self):
+        isbn = self.get_isbn()
+        if isbn:
+            return isbnlib.meta(isbn)
+        return {}
+
     def get_expected_title(self):
         if self._title:
             return self._title
@@ -102,20 +113,13 @@ class PDF:
     def get_authors(self):
         isbn = self.get_isbn()
         if isbn:
-            meta = isbnlib.meta(isbn)
-            if meta.get("Authors", None):
-                return meta["Authors"]
+            return self.isbn_meta.get("Authors", [])
         return []
 
     def get_title(self):
         if self._title:
             return self._title
-
-        isbn = self.get_isbn()
-        if isbn:
-            meta = isbnlib.meta(isbn)
-            if meta.get("Title", None):
-                return meta["Title"]
+        return self.isbn_meta.get("Title", None)
 
     def set_title(self, book):
         title = self.get_title()
@@ -147,9 +151,7 @@ class PDF:
     def get_publisher(self):
         isbn = self.get_isbn()
         if isbn:
-            meta = isbnlib.meta(isbn)
-            if meta.get("Publisher", None):
-                return meta["Publisher"]
+            return self.isbn_meta.get("Publisher", None)
 
     def set_publisher(self, book):
         book.set_unique_metadata("DC", "publisher", self.get_publisher())
@@ -158,9 +160,7 @@ class PDF:
     def get_published_date(self):
         isbn = self.get_isbn()
         if isbn:
-            meta = isbnlib.meta(isbn)
-            if meta.get("Year", None):
-                return meta["Year"]
+            return self.isbn_meta.get("Year", None)
 
     def set_published_date(self, book):
         book.set_unique_metadata("DC", "date", self.get_published_date())
@@ -179,7 +179,9 @@ class PDF:
                 for image in page.images:
                     book.add_item(image)
 
-        for i in range(10):  # FIXME: hacky
+        last_hash = None
+        while last_hash != self.content_hash:
+            last_hash = self.content_hash
             self.pages.set_page_number_position()
             header = self.pages.detect_header()
             footer = self.pages.detect_footer()
