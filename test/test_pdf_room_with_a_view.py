@@ -24,7 +24,9 @@ class RoomWithAViewPDFTest(TestCase):
         for page in pdf.pages:
             contents.append(page)
 
-        for i in range(10):  # FIXME: hacky
+        last_hash = None
+        while last_hash != pdf.content_hash:
+            last_hash = pdf.content_hash
             pdf.pages.set_page_number_position()
             header = pdf.pages.detect_header()
             footer = pdf.pages.detect_footer()
