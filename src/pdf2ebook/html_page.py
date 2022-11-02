@@ -195,6 +195,8 @@ class HTMLPage(BasePage):
                 soup_line = bs4.BeautifulSoup(StringIO(line), "html.parser")
                 if soup_line.text.strip() == "":
                     collect = True
+                else:
+                    content.append(line)
         if content:
             self.content = "\n".join(content)
 
