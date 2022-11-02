@@ -2,8 +2,9 @@ import os
 import re
 import difflib
 import unicodedata
-from io import StringIO
 import urllib.request
+from io import StringIO
+from collections import defaultdict
 
 import isbnlib
 import bs4
@@ -16,6 +17,11 @@ from pdf2ebook.text_page import TextPage
 from pdf2ebook.html_page import HTMLPage
 from pdf2ebook.pages import Pages
 from pdf2ebook.utils import window, get_isbn, isbns_from_words
+
+
+META_CACHE = defaultdict(dict)
+ISBN_CACHE = defaultdict(str)
+ISBNS_CACHE = defaultdict(list)
 
 
 class PDF:
@@ -38,10 +44,13 @@ class PDF:
 
     @property
     def isbn_meta(self):
+        if self.content_hash in META_CACHE:
+            return META_CACHE[self.content_hash]
         isbn = self.get_isbn()
         if isbn:
-            return isbnlib.meta(isbn)
-        return {}
+            data = isbnlib.meta(isbn)
+            META_CACHE[self.content_hash] = data
+        return META_CACHE[self.content_hash]
 
     def get_expected_title(self):
         if self._title:
@@ -74,6 +83,9 @@ class PDF:
             return content_title
 
     def get_isbn(self):
+        if self.content_hash in ISBN_CACHE:
+            return ISBN_CACHE[self.content_hash]
+
         for page in self.pages:
             isbn = get_isbn(page.cleaned_text_content)
             if isbn:
@@ -82,16 +94,21 @@ class PDF:
                 except isbnlib._exceptions.NotValidISBNError:
                     logger.warning(f"Not a valid ISBN: {isbn}")
                 else:
-                    return isbn
+                    ISBN_CACHE[self.content_hash] = isbn
+
+        if self.content_hash in ISBN_CACHE:
+            return ISBN_CACHE[self.content_hash]
 
         expected_title = self.get_expected_title()
         if expected_title:
             logger.info(f"Guessing the isbn from title: {expected_title}")
-            return isbnlib.isbn_from_words(expected_title)
+            ISBN_CACHE[self.content_hash] = isbnlib.isbn_from_words(expected_title)
+
+        return ISBN_CACHE[self.content_hash]
 
     def get_isbns(self):
-
-        isbns = []
+        if self.content_hash in ISBNS_CACHE:
+            return ISBNS_CACHE[self.content_hash]
 
         for page in self.pages:
             isbn = get_isbn(page.cleaned_text_content)
@@ -101,14 +118,14 @@ class PDF:
                 except isbnlib._exceptions.NotValidISBNError:
                     logger.warning(f"Not a valid ISBN: {isbn}")
                 else:
-                    isbns.append(isbn)
+                    ISBNS_CACHE[self.content_hash].append(isbn)
 
         expected_title = self.get_expected_title()
         if expected_title:
             logger.info(f"Guessing the isbn from title: {expected_title}")
-            isbns.extend(isbns_from_words(expected_title))
+            ISBNS_CACHE[self.content_hash].extend(isbns_from_words(expected_title))
 
-        return list(set(isbns))
+        return ISBNS_CACHE[self.content_hash]
 
     def get_authors(self):
         isbn = self.get_isbn()
