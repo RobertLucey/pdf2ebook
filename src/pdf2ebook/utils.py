@@ -14,6 +14,7 @@ ISBN_PATTERN = re.compile(ISBN_REGEX, re.UNICODE)
 
 
 def get_isbn(text):
+    text = re.sub(r"\s+", "", text, flags=re.UNICODE)
     matches = ISBN_PATTERN.findall(text)
     if matches:
         return matches[0]
