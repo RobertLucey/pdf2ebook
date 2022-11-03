@@ -197,9 +197,10 @@ class HTMLPage(BasePage):
                 content.append(line)
             else:
                 soup_line = bs4.BeautifulSoup(StringIO(line), "html.parser")
-                if soup_line.text.strip() == "":
-                    collect = True
+                if soup_line.text.strip() == "" and soup.find("img") is None:
+                    continue
                 else:
+                    collect = True
                     content.append(line)
         if content:
             self.content = "\n".join(content)
@@ -213,7 +214,10 @@ class HTMLPage(BasePage):
                 content.append(line)
             else:
                 soup_line = bs4.BeautifulSoup(StringIO(line), "html.parser")
-                if soup_line.text.strip() == "":
+                if soup_line.text.strip() == "" and soup.find("img") is None:
+                    continue
+                else:
                     collect = True
+                    content.append(line)
         if content:
             self.content = "\n".join(reversed(content))
