@@ -1,7 +1,7 @@
 PDF2EBook
 =========
 
-Convert pdfs to an epub
+Convert pdfs to an epub, geared towards books. Adds cover, metadata like author / title / isbn
 
 
 Dependencies
@@ -21,4 +21,4 @@ Installation
 Usage
 -----
 
-`pdf2epub --in something.pdf --out other.epub`
+`pdf2epub --in something.pdf --out other.epub --title "Optional but helpful title"`
