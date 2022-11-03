@@ -40,12 +40,16 @@ class MobyDickPDFTest(TestCase):
     def test_detect_footer(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
-        self.assertEquals(pdf.pages.detect_footer(), 'Created for Lit2Go on the web at etc.usf.edu')
+        self.assertEquals(
+            pdf.pages.detect_footer(), "Created for Lit2Go on the web at etc.usf.edu"
+        )
 
     def test_detect_header(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
-        self.assertEquals(pdf.pages.detect_header(), 'Moby Dick:\xa0Chapter 1\xa0by Herman Melville')
+        self.assertEquals(
+            pdf.pages.detect_header(), "Moby Dick:\xa0Chapter 1\xa0by Herman Melville"
+        )
 
     def test_remove_page_number(self):
         pdf = PDF(path=self.PDF_PATH)
@@ -116,7 +120,7 @@ But look! here come more crowds, pacing straight for the water, and seemingly b
 Once more. Say you are in the country; in some high land of lakes. Take almost any path you please, and ten to one it carries you down in a dale, and leaves you there by a pool in the stream. There is magic in it. Let the most absent-minded of men be plunged in his deepest reveries- stand that man on his legs, set his feet a-going, and he will infallibly lead you to water, if water there be in all that region. Should you ever be athirst in the great American desert, try this experiment, if your caravan happen to be supplied with a metaphysical professor. Yes, as every one knows, meditation and water are wedded for ever.
 But here is an artist. He desires to paint you the dreamiest, shadiest, quietest, most enchanting bit of romantic landscape in all the valley of the Saco. What is the chief element he employs? There stand his trees,
 2
-Created for Lit2Go on the web at etc.usf.edu"""
+Created for Lit2Go on the web at etc.usf.edu""",
         )
 
     def test_pages_context(self):

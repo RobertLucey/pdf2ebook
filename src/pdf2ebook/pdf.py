@@ -141,7 +141,7 @@ class PDF:
     def set_title(self, book):
         title = self.get_title()
         if title:
-            logger.debug(f'Set title: {title}')
+            logger.debug(f"Set title: {title}")
             book.set_title(title)
         else:
             book.set_title(os.path.splitext(os.path.basename(self.pdf_path))[0])
@@ -151,14 +151,14 @@ class PDF:
         isbn = self.get_isbn()
         if isbn:
             for author in self.get_authors():
-                logger.debug(f'Add author: {author}')
+                logger.debug(f"Add author: {author}")
                 book.add_author(author)
         return book
 
     def set_identifier(self, book):
         isbn = self.get_isbn()
         if isbn:
-            logger.debug(f'Setting ISBN: {isbn}')
+            logger.debug(f"Setting ISBN: {isbn}")
             book.set_identifier(isbn)
         return book
 
@@ -175,7 +175,7 @@ class PDF:
 
     def set_publisher(self, book):
         if self.get_publisher():
-            logger.debug(f'Setting publisher: {self.get_publisher()}')
+            logger.debug(f"Setting publisher: {self.get_publisher()}")
         book.set_unique_metadata("DC", "publisher", self.get_publisher())
         return book
 
@@ -186,7 +186,7 @@ class PDF:
 
     def set_published_date(self, book):
         if self.get_published_date():
-            logger.debug(f'Setting published date: {self.get_published_date()}')
+            logger.debug(f"Setting published date: {self.get_published_date()}")
         book.set_unique_metadata("DC", "date", self.get_published_date())
         return book
 

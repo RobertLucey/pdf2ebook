@@ -80,10 +80,10 @@ class Pages:
 
         # make sure 50% of pages follow the pattern
         if top_matches > len(self) / 2 and bottom_matches < len(self) / 2:
-            logger.debug('Detected page number position: top')
+            logger.debug("Detected page number position: top")
             for page in self:
                 page.page_number_position = "top"
         elif bottom_matches > len(self) / 2 and top_matches < len(self) / 2:
-            logger.debug('Detected page number position: bottom')
+            logger.debug("Detected page number position: bottom")
             for page in self:
                 page.page_number_position = "bottom"
