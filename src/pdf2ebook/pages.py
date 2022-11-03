@@ -63,11 +63,6 @@ class TextPages(BasePages):
                 return line
 
     def set_page_number_position(self):
-
-        # FIXME: For html use tag context rather than just text
-
-        # TODO: Need to remove headers / footers in some cases
-
         top_matches = 0
         for page in self:
             first_line = page.cleaned_text_content.split("\n")[0]
@@ -130,8 +125,6 @@ class HtmlPages(BasePages):
     def set_page_number_position(self):
 
         # FIXME: For html use tag context rather than just text
-
-        # TODO: Need to remove headers / footers in some cases
 
         top_matches = 0
         for page in self:
