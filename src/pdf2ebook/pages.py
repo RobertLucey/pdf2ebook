@@ -5,7 +5,7 @@ from pdf2ebook import logger
 from pdf2ebook.utils import window
 
 
-class Pages:
+class BasePages:
     def __init__(self, *args, **kwargs):
         self._data = []
 
@@ -25,6 +25,8 @@ class Pages:
         for one, two in window(self._data, window_size=2):
             one.set_next_page(two)
 
+
+class TextPages(BasePages):
     def detect_header(self):
         lines = []
         for page in self:
@@ -87,3 +89,77 @@ class Pages:
             logger.debug("Detected page number position: bottom")
             for page in self:
                 page.page_number_position = "bottom"
+
+
+class HtmlPages(BasePages):
+    def detect_header(self):
+        lines = []
+        for page in self:
+            lines.extend(
+                [
+                    i
+                    for i in page.cleaned_text_content.split("\n")[:3]
+                    if i  # FIXME: shouldn't need to check, cleaned data should be stripped
+                ]
+            )
+        if len(Counter(lines).most_common(1)):
+            line, count = Counter(lines).most_common(1)[0]
+            # look over the first x lines and watch for similarities
+            if count > len(self) / 4:
+                logger.debug(f"Detected header: {line}")
+                return line
+
+    def detect_footer(self):
+        lines = []
+        for page in self:
+            lines.extend(
+                [
+                    i
+                    for i in page.cleaned_text_content.split("\n")[-3:]
+                    if i  # FIXME: shouldn't need to check, cleaned data should be stripped
+                ]
+            )
+
+        if len(Counter(lines).most_common(1)):
+            line, count = Counter(lines).most_common(1)[0]
+            # look over the first x lines and watch for similarities
+            if count > len(self) / 4:
+                logger.debug(f"Detected footer: {line}")
+                return line
+
+    def set_page_number_position(self):
+
+        # FIXME: For html use tag context rather than just text
+
+        # TODO: Need to remove headers / footers in some cases
+
+        top_matches = 0
+        for page in self:
+            first_line = page.cleaned_text_content.split("\n")[0]
+            if re.match("^\d+", first_line) or re.match("\d+$", first_line):
+                top_matches += 1
+
+        bottom_matches = 0
+        for page in self:
+            last_line = page.cleaned_text_content.split("\n")[-1]
+            if re.match("^\d+", last_line) or re.match("\d+$", last_line):
+                bottom_matches += 1
+
+        # make sure 50% of pages follow the pattern
+        if top_matches > len(self) / 2 and bottom_matches < len(self) / 2:
+            for page in self:
+                page.page_number_position = "top"
+        elif bottom_matches > len(self) / 2 and top_matches < len(self) / 2:
+            for page in self:
+                page.page_number_position = "bottom"
+
+
+class HtmlExPages(BasePages):
+    def detect_header(self):
+        raise NotImplementedError()
+
+    def detect_footer(self):
+        raise NotImplementedError()
+
+    def set_page_number_position(self):
+        raise NotImplementedError()

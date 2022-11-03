@@ -1,12 +1,12 @@
 from unittest import TestCase
 
 from pdf2ebook.text_page import TextPage
-from pdf2ebook.pages import Pages
+from pdf2ebook.pages import TextPages
 
 
 class PagesTest(TestCase):
     def test_detect_header(self):
-        pages = Pages()
+        pages = TextPages()
         for i in range(100):
             pages.append(
                 TextPage(
@@ -18,7 +18,7 @@ class PagesTest(TestCase):
         self.assertEqual(pages.detect_header(), "Header")
 
     def test_detect_footer(self):
-        pages = Pages()
+        pages = TextPages()
         for i in range(100):
             pages.append(
                 TextPage(

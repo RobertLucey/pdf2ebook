@@ -15,7 +15,7 @@ from cached_property import cached_property
 from pdf2ebook import logger
 from pdf2ebook.text_page import TextPage
 from pdf2ebook.html_page import HTMLPage
-from pdf2ebook.pages import Pages
+from pdf2ebook.pages import TextPages, HtmlPages, HtmlExPages
 from pdf2ebook.utils import window, get_isbn, isbns_from_words
 
 
@@ -314,9 +314,10 @@ class PDF:
         self.load()
 
         # TODO Find contents / table of contents and start after that. Who needs acks
-        pages = Pages()
+        pages = None
 
         if self.use_text:
+            pages = TextPages()
             logger.debug("Generating pages using only text")
             # TODO: if all the content looks to be in html, use that rather than text
             for idx, (p, c, n) in enumerate(
@@ -325,6 +326,7 @@ class PDF:
                 pages.append(TextPage(idx, self.text_content))
 
         elif self.use_html:
+            pages = HtmlPages()
             logger.debug("Generating pages using html")
 
             soup = bs4.BeautifulSoup(open(self.html_file), "html.parser")
