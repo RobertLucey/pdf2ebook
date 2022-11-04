@@ -1,5 +1,6 @@
 import os
 
+from mock import patch
 from unittest import TestCase
 
 from pdf2ebook.pdf import PDF
@@ -11,11 +12,13 @@ class MobyDickPDFTest(TestCase):
     EPUB_NAME = "test_moby_dick.epub"
     EXPECTED_PAGES = 7
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_get_thumbnail_url(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         self.assertIsNotNone(pdf.get_thumbnail_url())
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_get_expected_title(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -37,6 +40,7 @@ class MobyDickPDFTest(TestCase):
 
         self.assertEquals(pdf.get_expected_title(), "moby dick")
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_detect_footer(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -44,6 +48,7 @@ class MobyDickPDFTest(TestCase):
             pdf.pages.detect_footer(), "Created for Lit2Go on the web at etc.usf.edu"
         )
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_detect_header(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -51,6 +56,7 @@ class MobyDickPDFTest(TestCase):
             pdf.pages.detect_header(), "Moby Dick:\xa0Chapter 1\xa0by Herman Melville"
         )
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_remove_page_number(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -75,6 +81,7 @@ Once more. Say you are in the country; in some high land of lakes. Take <br/>a
 But here is an artist. He desires to paint you the dreamiest, shadiest, <br/>quietest, most enchanting bit of romantic landscape in all the valley of <br/>the Saco. What is the chief element he employs? There stand his trees, <br/>""",
         )
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_page_number_position(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -93,6 +100,7 @@ But here is an artist. He desires to paint you the dreamiest, shadiest, <br/>qu
         pdf.pages.set_page_number_position()
         self.assertEquals(pdf.pages[0].page_number_position, "bottom")
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_pages_content(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -108,6 +116,7 @@ But here is an artist. He desires to paint you the dreamiest, shadiest, quietes
 Created for Lit2Go on the web at etc.usf.edu""",
         )
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_pages_cleaned_content(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -123,6 +132,7 @@ But here is an artist. He desires to paint you the dreamiest, shadiest, quietes
 Created for Lit2Go on the web at etc.usf.edu""",
         )
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_pages_context(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -138,6 +148,7 @@ Created for Lit2Go on the web at etc.usf.edu""",
                     pdf.pages._data[i + 1].idx,
                 )
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_to_epub(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -148,6 +159,7 @@ Created for Lit2Go on the web at etc.usf.edu""",
         pdf.to_epub(f"/tmp/{self.EPUB_NAME}")
         self.assertTrue(os.path.exists(f"/tmp/{self.EPUB_NAME}"))
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_to_html(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()

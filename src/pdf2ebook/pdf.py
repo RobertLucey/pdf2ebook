@@ -5,6 +5,7 @@ import unicodedata
 import urllib.request
 from io import StringIO
 from collections import defaultdict
+from shutil import which
 
 import isbnlib
 import bs4
@@ -15,6 +16,7 @@ from cached_property import cached_property
 from pdf2ebook import logger
 from pdf2ebook.text_page import TextPage
 from pdf2ebook.html_page import HTMLPage
+from pdf2ebook.htmlex_page import HTMLExPage
 from pdf2ebook.pages import TextPages, HtmlPages, HtmlExPages
 from pdf2ebook.utils import window, get_isbn, isbns_from_words
 
@@ -26,15 +28,19 @@ ISBNS_CACHE = defaultdict(list)
 
 class PDF:
     def __init__(self, *args, **kwargs):
-        self.pdf_path = kwargs["path"]
-        self._title = kwargs.get("title", None)
         self._use_text = kwargs.get("use_text", None)
         self._use_html = kwargs.get("use_html", None)
+        self._use_html_ex = kwargs.get("use_html_ex", None)
+
+        self.pdf_path = kwargs["path"]
+        self._title = kwargs.get("title", None)
 
         self.text_content = None
+        self.html_ex_content = None
 
         self.text_file = None
         self.html_file = None
+        self.html_ex_file = None
 
         self.loaded = False
 
@@ -280,12 +286,27 @@ class PDF:
             self.loaded = True
             return
 
+    def load_html_ex(self):
+        if self.use_html_ex:
+            self.html_ex_file = self.pdf_path + ".ex.html"
+
+            os.system(f"pdf2htmlEX '{self.pdf_path}' '{self.html_ex_file}'")
+
+            if not os.path.exists(self.html_ex_file):
+                logger.error(
+                    "Could not convert pdf to htmlex: %s" % (self.html_ex_file)
+                )
+                return
+
+            self.html_ex_content = open(self.html_ex_file, "r").read()
+
     def load(self):
         if self.loaded:
             return
 
         self.load_text()
         self.load_html()
+        self.load_html_ex()
 
     @property
     def use_text(self):
@@ -309,6 +330,13 @@ class PDF:
 
         return False
 
+    @property
+    def use_html_ex(self):
+        if self._use_html_ex is not None:
+            return self._use_html_ex
+
+        return which("pdf2htmlEX") is not None
+
     @cached_property
     def pages(self):
         self.load()
@@ -316,14 +344,23 @@ class PDF:
         # TODO Find contents / table of contents and start after that. Who needs acks
         pages = None
 
-        if self.use_text:
-            pages = TextPages()
-            logger.debug("Generating pages using only text")
-            # TODO: if all the content looks to be in html, use that rather than text
-            for idx, (p, c, n) in enumerate(
-                window(self.text_content.split("\x0c"), window_size=3)
-            ):
-                pages.append(TextPage(idx, self.text_content))
+        if self.use_html_ex:
+            pages = HtmlExPages()
+            logger.debug("Generating pages using htmlex")
+
+            # pages can be split by data-page-no
+            # need to keep the head on each
+
+            soup = bs4.BeautifulSoup(open(self.html_ex_file), "html.parser")
+            head = soup.find("head")
+
+            page_container = soup.find("div", {"id": "page-container"})
+
+            page_no = 0
+            for idx, page in enumerate(page_container):
+                if page.text.strip():  # TODO: also check for images
+                    pages.append(HTMLExPage(page_no, page, head=head))
+                    page_no += 1
 
         elif self.use_html:
             pages = HtmlPages()
@@ -353,6 +390,15 @@ class PDF:
                         ),
                     )
                 )
+        elif self.use_text:
+            pages = TextPages()
+            logger.debug("Generating pages using only text")
+            # TODO: if all the content looks to be in html, use that rather than text
+            for idx, (p, c, n) in enumerate(
+                window(self.text_content.split("\x0c"), window_size=3)
+            ):
+                pages.append(TextPage(idx, self.text_content))
+
         else:
             raise Exception("Could not convert")
 

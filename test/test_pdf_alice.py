@@ -1,5 +1,6 @@
 import os
 
+from mock import patch
 from unittest import TestCase
 
 from pdf2ebook.pdf import PDF
@@ -11,11 +12,13 @@ class AlicePDFTest(TestCase):
     EPUB_NAME = "test_alice.epub"
     EXPECTED_PAGES = 21
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_get_thumbnail_url(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         self.assertIsNotNone(pdf.get_thumbnail_url())
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_get_expected_title(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -37,16 +40,19 @@ class AlicePDFTest(TestCase):
 
         self.assertEquals(pdf.get_expected_title(), "alice's adventures in wonderland")
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_detect_footer(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         self.assertEquals(pdf.pages.detect_footer(), None)
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_detect_header(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         self.assertEquals(pdf.pages.detect_header(), None)
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_remove_page_number(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -70,12 +76,14 @@ So she was considering, in her own mind (as well as she could, for the hot day 
 feel very sleepy and stupid), whether the pleasure of making a daisy-chain would be <br/>""",
         )
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_page_number_position(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         pdf.pages.set_page_number_position()
         self.assertEquals(pdf.pages[0].page_number_position, "top")
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_page_without_page_no(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -98,6 +106,7 @@ So she was considering, in her own mind (as well as she could, for the hot day 
 feel very sleepy and stupid), whether the pleasure of making a daisy-chain would be""",
         )
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_pages_content(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -121,6 +130,7 @@ So she was considering, in her own mind (as well as she could, for the hot day 
 feel very sleepy and stupid), whether the pleasure of making a daisy-chain would be""",
         )
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_pages_cleaned_content(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -144,6 +154,7 @@ So she was considering, in her own mind (as well as she could, for the hot day 
 feel very sleepy and stupid), whether the pleasure of making a daisy-chain would be""",
         )
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_pages_context(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -159,6 +170,7 @@ feel very sleepy and stupid), whether the pleasure of making a daisy-chain wo
                     pdf.pages._data[i + 1].idx,
                 )
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_to_epub(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -169,6 +181,7 @@ feel very sleepy and stupid), whether the pleasure of making a daisy-chain wo
         pdf.to_epub(f"/tmp/{self.EPUB_NAME}")
         self.assertTrue(os.path.exists(f"/tmp/{self.EPUB_NAME}"))
 
+    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_to_html(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()

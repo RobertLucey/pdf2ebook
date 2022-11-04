@@ -9,6 +9,11 @@ def main():
     parser.add_argument("--in", type=str, dest="in_file", required=True)
     parser.add_argument("--out", type=str, dest="out_file", required=True)
     parser.add_argument(
+        "--force-html-ex",
+        action="store_true",
+        dest="force_html_ex",
+    )
+    parser.add_argument(
         "--force-html",
         action="store_true",
         dest="force_html",
@@ -34,6 +39,7 @@ def main():
 
     pdf = PDF(
         path=args.in_file,
+        use_html_ex=args.force_html_ex,
         use_html=args.force_html,
         use_text=args.force_text,
         title=args.title,
