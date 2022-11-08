@@ -1,6 +1,8 @@
 import argparse
 from shutil import which
 
+from pdf2ebook import logger
+
 from pdf2ebook.pdf import PDF
 from pdf2ebook.htmlex_pdf import HTMLEX_PDF
 
@@ -46,6 +48,7 @@ def main():
         )
         pdf.to_epub(path=args.out_file)
     else:
+        logger.warning('Not using pdf2epubEX which is recommended')
         pdf = PDF(
             path=args.in_file,
             use_html_ex=args.force_html_ex,
