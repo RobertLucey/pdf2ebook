@@ -11,6 +11,8 @@ Poppler - `sudo apt install libpoppler-cpp-dev`
 
 PDFToHTML - `sudo apt install pdftohtml`
 
+pdf2epubEX - https://github.com/dodeeric/pdf2epubEX
+
 
 Installation
 ------------
