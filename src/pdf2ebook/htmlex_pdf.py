@@ -231,7 +231,6 @@ class HTMLEX_PDF:
         )
 
     def to_epub(self, path=None):
-
         self.to_html()
         self.modify_pages()
         self.create_structure()
@@ -242,11 +241,12 @@ class HTMLEX_PDF:
         self.write_content()
         self.write_cover()
 
-        # TODO: merge pwd with path
-
         dir_path = os.path.dirname(os.path.realpath(__file__))
 
-        path_to_out_epub = os.path.join(dir_path, path)
+        if path:
+            path_to_out_epub = os.path.join(dir_path, path)
+        else:
+            path_to_out_epub = os.path.join(dir_path, 'converted_pdf.epub')
 
         os.system(
             f"cd /tmp/book && zip -0Xq {path_to_out_epub} ./mimetype && zip -Xr9Dq {path_to_out_epub} ./* -x ./mimetype -x {path_to_out_epub}"
