@@ -18,6 +18,8 @@ class HTMLEX_PDF:
     def __init__(self, *args, **kwargs):
         self.pdf_path = kwargs["path"]
         self.dot_pages = []
+        self.tmp_path = os.path.join('/tmp/', os.path.basename(self.pdf_path))
+        shutil.copyfile(self.pdf_path, self.tmp_path)
 
     @property
     def content_hash(self):
@@ -218,14 +220,14 @@ class HTMLEX_PDF:
             )
 
     def write_cover(self):
-        os.system(f"pdftoppm {self.pdf_path} cover -cropbox -png -f 1 -singlefile")
+        os.system(f"pdftoppm {self.tmp_path} cover -cropbox -png -f 1 -singlefile")
 
         logger.debug(f'Move: cover.png -> {self.OEBPS}')
         shutil.move("cover.png", self.OEBPS)
 
     def to_html(self):
         os.system(
-            f"pdf2htmlEX --quiet 1 --embed-css 0 --embed-font 0 --embed-image 0 --embed-javascript 0 --embed-outline 0 --split-pages 1 --page-filename convertedbook%04d.page --css-filename style.css {self.pdf_path}"
+            f"pdf2htmlEX --quiet 1 --embed-css 0 --embed-font 0 --embed-image 0 --embed-javascript 0 --embed-outline 0 --split-pages 1 --page-filename convertedbook%04d.page --css-filename style.css {self.tmp_path}"
         )
 
     def to_epub(self, path=None):
@@ -242,8 +244,12 @@ class HTMLEX_PDF:
 
         # TODO: merge pwd with path
 
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+
+        path_to_out_epub = os.path.join(dir_path, path)
+
         os.system(
-            "cd /tmp/book && zip -0Xq ./something.epub ./mimetype && zip -Xr9Dq ./something.epub ./* -x ./mimetype -x ./something.epub"
+            f"cd /tmp/book && zip -0Xq {path_to_out_epub} ./mimetype && zip -Xr9Dq {path_to_out_epub} ./* -x ./mimetype -x {path_to_out_epub}"
         )
 
-        logger.debug(f"Epub saved: {path}")
+        logger.debug(f"Epub saved: {path_to_out_epub}")
