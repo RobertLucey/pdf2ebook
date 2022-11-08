@@ -12,13 +12,11 @@ class RoomWithAViewPDFTest(TestCase):
     EPUB_NAME = "test_room_with_a_view.epub"
     EXPECTED_PAGES = 151
 
-    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_get_thumbnail_url(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         self.assertIsNotNone(pdf.get_thumbnail_url())
 
-    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_get_expected_title(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -40,26 +38,22 @@ class RoomWithAViewPDFTest(TestCase):
 
         self.assertEquals(pdf.get_expected_title(), "a room with a view")
 
-    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_detect_footer(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         self.assertEquals(pdf.pages.detect_footer(), None)
 
-    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_detect_header(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         self.assertEquals(pdf.pages.detect_header(), None)
 
-    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_page_number_position(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         pdf.pages.set_page_number_position()
         self.assertEquals(pdf.pages[0].page_number_position, "bottom")
 
-    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_pages_content(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -79,7 +73,6 @@ by Candida Martinelli of 
 Candida Martinelli’s Italophile Site""",
         )
 
-    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_pages_cleaned_content(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -99,7 +92,6 @@ by Candida Martinelli of
 Candida Martinelli’s Italophile Site""",
         )
 
-    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_pages_context(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -115,7 +107,6 @@ Candida Martinelli’s Italophile Site""",
                     pdf.pages._data[i + 1].idx,
                 )
 
-    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_to_epub(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
@@ -127,7 +118,6 @@ Candida Martinelli’s Italophile Site""",
         self.assertTrue(os.path.exists(f"/tmp/{self.EPUB_NAME}"))
         self.assertGreater(os.path.getsize(f"/tmp/{self.EPUB_NAME}"), 0)
 
-    @patch("pdf2ebook.pdf.PDF.use_html_ex", False)
     def test_to_html(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()

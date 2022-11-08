@@ -145,14 +145,3 @@ class HtmlPages(BasePages):
         elif bottom_matches > len(self) / 2 and top_matches < len(self) / 2:
             for page in self:
                 page.page_number_position = "bottom"
-
-
-class HtmlExPages(BasePages):
-    def detect_header(self):
-        raise NotImplementedError()
-
-    def detect_footer(self):
-        raise NotImplementedError()
-
-    def set_page_number_position(self):
-        raise NotImplementedError()

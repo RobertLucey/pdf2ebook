@@ -16,8 +16,7 @@ from cached_property import cached_property
 from pdf2ebook import logger
 from pdf2ebook.text_page import TextPage
 from pdf2ebook.html_page import HTMLPage
-from pdf2ebook.htmlex_page import HTMLExPage
-from pdf2ebook.pages import TextPages, HtmlPages, HtmlExPages
+from pdf2ebook.pages import TextPages, HtmlPages
 from pdf2ebook.utils import window, get_isbn, isbns_from_words
 
 
@@ -286,27 +285,12 @@ class PDF:
             self.loaded = True
             return
 
-    def load_html_ex(self):
-        if self.use_html_ex:
-            self.html_ex_file = self.pdf_path + ".ex.html"
-
-            os.system(f"pdf2htmlEX '{self.pdf_path}' '{self.html_ex_file}'")
-
-            if not os.path.exists(self.html_ex_file):
-                logger.error(
-                    "Could not convert pdf to htmlex: %s" % (self.html_ex_file)
-                )
-                return
-
-            self.html_ex_content = open(self.html_ex_file, "r").read()
-
     def load(self):
         if self.loaded:
             return
 
         self.load_text()
         self.load_html()
-        self.load_html_ex()
 
     @property
     def use_text(self):
@@ -344,25 +328,7 @@ class PDF:
         # TODO Find contents / table of contents and start after that. Who needs acks
         pages = None
 
-        if self.use_html_ex:
-            pages = HtmlExPages()
-            logger.debug("Generating pages using htmlex")
-
-            # pages can be split by data-page-no
-            # need to keep the head on each
-
-            soup = bs4.BeautifulSoup(open(self.html_ex_file), "html.parser")
-            head = soup.find("head")
-
-            page_container = soup.find("div", {"id": "page-container"})
-
-            page_no = 0
-            for idx, page in enumerate(page_container):
-                if page.text.strip():  # TODO: also check for images
-                    pages.append(HTMLExPage(page_no, page, head=head))
-                    page_no += 1
-
-        elif self.use_html:
+        if self.use_html:
             pages = HtmlPages()
             logger.debug("Generating pages using html")
 
