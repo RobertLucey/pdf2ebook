@@ -1,4 +1,5 @@
 import os
+import unicodedata
 
 from mock import patch
 from unittest import TestCase, skip
@@ -140,3 +141,25 @@ class VortexPDFTest_EX(TestCase):
         pdf.to_html()
         pdf.modify_pages()
         self.assertEquals(len(list(pdf.dot_pages)), self.EXPECTED_PAGES)
+
+    def test_pages(self):
+        pdf = HTMLEX_PDF(path=self.PDF_PATH)
+        pdf.to_html()
+        pdf.modify_pages()
+        pdf.create_structure()
+        pdf.write_mimetype()
+        pdf.move_to_oebps()
+
+        self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
+        self.assertEquals(
+            pdf.pages[0].text_content,
+            """INTRODUCING "Storm" Cloud, who, through tragedy, is destined to become the most noted figure in the
+galaxy—
+The Vortex Blaster
+***
+E. E. SMITH, Ph.D.
+Author of "The Skylark,""Skylark Three,""The Skylark of Valeron," the Lensman stories, etc.
+Comet
+Published in July 1941
+epubBooks.com""",
+        )

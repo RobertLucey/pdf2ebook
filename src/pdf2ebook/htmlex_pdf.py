@@ -4,6 +4,8 @@ import glob
 import uuid
 
 from pdf2ebook import logger
+from pdf2ebook.html_page import HTMLPage
+from pdf2ebook.pages import HtmlPages
 
 
 class HTMLEX_PDF:
@@ -19,7 +21,7 @@ class HTMLEX_PDF:
     def __init__(self, *args, **kwargs):
         self.pdf_path = kwargs["path"]
         self.dot_pages = []
-        self.tmp_path = os.path.join('/tmp/', os.path.basename(self.pdf_path))
+        self.tmp_path = os.path.join("/tmp/", os.path.basename(self.pdf_path))
         shutil.copyfile(self.pdf_path, self.tmp_path)
 
     @property
@@ -52,7 +54,9 @@ class HTMLEX_PDF:
                 f.write(content)
             logger.debug(f'Move: {page} -> {os.path.splitext(page)[0] + ".xhtml"}')
             os.rename(page, os.path.splitext(page)[0] + ".xhtml")
-            self.dot_pages.append((page, page.replace(".page", "").replace("convertedbook", "")))  # FIXME: icky
+            self.dot_pages.append(
+                (page, page.replace(".page", "").replace("convertedbook", ""))
+            )  # FIXME: icky
 
     def create_structure(self):
         logger.info("Creating structure")
@@ -61,33 +65,33 @@ class HTMLEX_PDF:
         except:
             pass
 
-        logger.debug(f'mkdir: {self.ROOT}')
+        logger.debug(f"mkdir: {self.ROOT}")
         os.mkdir(self.ROOT)
-        logger.debug(f'mkdir: {self.META_INF}')
+        logger.debug(f"mkdir: {self.META_INF}")
         os.mkdir(self.META_INF)
-        logger.debug(f'mkdir: {self.OEBPS}')
+        logger.debug(f"mkdir: {self.OEBPS}")
         os.mkdir(self.OEBPS)
 
     def move_to_oebps(self):
         logger.info("Move to oebps")
         for data in sorted(glob.glob("*.css")):
-            logger.debug(f'Move: {data} -> {self.OEBPS}')
+            logger.debug(f"Move: {data} -> {self.OEBPS}")
             shutil.move(data, self.OEBPS)
         for data in sorted(glob.glob("*.woff")):
-            logger.debug(f'Move: {data} -> {self.OEBPS}')
+            logger.debug(f"Move: {data} -> {self.OEBPS}")
             shutil.move(data, self.OEBPS)
         for data in sorted(glob.glob("*.xhtml")):
-            logger.debug(f'Move: {data} -> {self.OEBPS}')
+            logger.debug(f"Move: {data} -> {self.OEBPS}")
             shutil.move(data, self.OEBPS)
 
         for data in sorted(glob.glob("*.png")):
-            logger.debug(f'Move: {data} -> {self.OEBPS}')
+            logger.debug(f"Move: {data} -> {self.OEBPS}")
             shutil.move(data, self.OEBPS)
         for data in sorted(glob.glob("*.jpg")):
-            logger.debug(f'Move: {data} -> {self.OEBPS}')
+            logger.debug(f"Move: {data} -> {self.OEBPS}")
             shutil.move(data, self.OEBPS)
         for data in sorted(glob.glob("*.svg")):
-            logger.debug(f'Move: {data} -> {self.OEBPS}')
+            logger.debug(f"Move: {data} -> {self.OEBPS}")
             shutil.move(data, self.OEBPS)
 
     def write_mimetype(self):
@@ -148,7 +152,7 @@ class HTMLEX_PDF:
             )
 
             for page in sorted(self.dot_pages):
-                logger.debug(f'Add page: href={page[0]}   content={page[1]}')
+                logger.debug(f"Add page: href={page[0]}   content={page[1]}")
                 f.write(f'   <li>\n    <a href="{page[0]}">{page[1]}</a>\n   </li>')
 
             f.write(
@@ -161,7 +165,7 @@ class HTMLEX_PDF:
     def write_content(self):
         logger.info("Write content")
 
-        logger.debug(f'Write: {self.CONTENT}')
+        logger.debug(f"Write: {self.CONTENT}")
         with open(self.CONTENT, "w") as f:
             content = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <package xmlns=\"http://www.idpf.org/2007/opf\" prefix=\"rendition: http://www.idpf.org/vocab/rendition/#\" unique-identifier=\"pub-id\" version=\"3.0\">
@@ -184,7 +188,9 @@ class HTMLEX_PDF:
             f.write(content)
 
             for data in sorted(glob.glob(f"{self.OEBPS}/*.xhtml")):
-                logger.debug(f'Add page: id={os.path.splitext(os.path.basename(data))[0]}   href={os.path.basename(data)}')
+                logger.debug(
+                    f"Add page: id={os.path.splitext(os.path.basename(data))[0]}   href={os.path.basename(data)}"
+                )
                 f.write(
                     f'    <item id="{os.path.splitext(os.path.basename(data))[0]}" href="{os.path.basename(data)}" media-type="application/xhtml+xml"/>\n'
                 )
@@ -194,36 +200,36 @@ class HTMLEX_PDF:
             f.write(
                 '    <item id="base-min-css" href="base.min.css" media-type="text/css"/>'
             )
-            f.write(
-                '    <item id="style-css" href="style.css" media-type="text/css"/>'
-            )
+            f.write('    <item id="style-css" href="style.css" media-type="text/css"/>')
             f.write(
                 '    <item id="cover-image" href="cover.png" media-type="image/png" properties="cover-image"/>'
             )
 
             f.write(
-                '''    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+                """    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
   </manifest>
-  <spine>'''
+  <spine>"""
             )
             for data in sorted(glob.glob(f"{self.OEBPS}/*.xhtml")):
-                logger.debug(f'Write spine item: {os.path.splitext(os.path.basename(data))[0]}')
+                logger.debug(
+                    f"Write spine item: {os.path.splitext(os.path.basename(data))[0]}"
+                )
                 f.write(
                     f'    <itemref idref="{os.path.splitext(os.path.basename(data))[0]}" properties="rendition:layout-pre-paginated"/>\n'
                 )
             f.write(
-                '''  </spine>
+                """  </spine>
   <guide>
     <reference type="cover" title="Cover" href="convertedbook0001.xhtml"/>
     <reference type="text" title="Text" href="convertedbook0002.xhtml"/>
   </guide>
-</package>'''
+</package>"""
             )
 
     def write_cover(self):
         os.system(f"pdftoppm {self.tmp_path} cover -cropbox -png -f 1 -singlefile")
 
-        logger.debug(f'Move: cover.png -> {self.OEBPS}')
+        logger.debug(f"Move: cover.png -> {self.OEBPS}")
         shutil.move("cover.png", self.OEBPS)
 
     def to_html(self):
@@ -247,10 +253,25 @@ class HTMLEX_PDF:
         if path:
             path_to_out_epub = os.path.join(dir_path, path)
         else:
-            path_to_out_epub = os.path.join(dir_path, 'converted_pdf.epub')
+            path_to_out_epub = os.path.join(dir_path, "converted_pdf.epub")
 
         os.system(
             f"cd /tmp/book && zip -0Xq {path_to_out_epub} ./mimetype && zip -Xr9Dq {path_to_out_epub} ./* -x ./mimetype -x {path_to_out_epub}"
         )
 
         logger.debug(f"Epub saved: {path_to_out_epub}")
+
+    @property
+    def pages(self):
+        pages = HtmlPages()
+        for idx, (page, _) in enumerate(self.dot_pages):
+            page = page.replace(".page", ".xhtml")
+            page_path = os.path.join(self.OEBPS, page)
+
+            content = None
+            with open(page_path, "r") as html_file:
+                content = html_file.read()
+
+            pages.append(HTMLPage(idx, content))
+
+        return pages
