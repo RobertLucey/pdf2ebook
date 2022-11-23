@@ -1,13 +1,14 @@
 import os
 import shutil
 import glob
+import uuid
 
 from pdf2ebook import logger
 
 
 class HTMLEX_PDF:
 
-    ROOT = "/tmp/book"
+    ROOT = f"/tmp/{uuid.uuid4()}"
     META_INF = f"{ROOT}/META-INF"
     OEBPS = f"{ROOT}/OEBPS"
     MIMETYPE = f"{ROOT}/mimetype"
