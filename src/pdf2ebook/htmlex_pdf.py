@@ -128,24 +128,8 @@ class HTMLEX_PDF:
 </head>
 <body>
   <nav epub:type=\"toc\" id=\"toc\">
-    <ol>
-      <li>
-        <a href=\"convertedbook0001.xhtml\">Chapter 1 Like This</a>
-      </li>
-      <li>
-        <a href=\"convertedbook0002.xhtml\">Chapter 2 Like This</a>
-      </li>
-    </ol>
   </nav>
   <nav epub:type=\"landmarks\">
-    <ol>
-      <li>
-        <a epub:type=\"frontmatter\" href=\"convertedbook0001.xhtml\">Cover</a>
-      </li>
-      <li>
-        <a epub:type=\"bodymatter\" href=\"convertedbook0002.xhtml\">Bodymatter</a>
-      </li>
-    </ol>
   </nav>
   <nav epub:type=\"page-list\" hidden=\"\">
   <ol>"""
