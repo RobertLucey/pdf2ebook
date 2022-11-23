@@ -41,14 +41,16 @@ def main():
     if not args.force_html:
         args.force_html = None
 
-    if args.force_html_ex or (which("pdf2htmlEX") and not args.force_html and not args.force_text):
+    if args.force_html_ex or (
+        which("pdf2htmlEX") and not args.force_html and not args.force_text
+    ):
         pdf = HTMLEX_PDF(
             path=args.in_file,
             title=args.title,
         )
         pdf.to_epub(path=args.out_file)
     else:
-        logger.warning('Not using pdf2epubEX which is recommended')
+        logger.warning("Not using pdf2epubEX which is recommended")
         pdf = PDF(
             path=args.in_file,
             use_html_ex=args.force_html_ex,

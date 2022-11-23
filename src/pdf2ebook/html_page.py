@@ -68,8 +68,25 @@ class HTMLPage(BasePage):
 
     @property
     def text_content(self):
+        # Below samples of a newline
+        """
+        t m0 xb h3 yb ff2 fs0 fc0 sc0 ls0 ws0
+        t m0 x1 h3 yc ff3 fs0 fc0 sc0 ls0 ws0
+        t m0 x1 h3 yd ff3 fs0 fc0 sc0 ls0 ws0
+        t m0 xb h3 ye ff1 fs0 fc0 sc0 ls0 ws0
+        t m0 xc h3 yf ff2 fs0 fc2 sc0 ls0 ws0
+        t m0 x1 h3 y10 ff2 fs0 fc0 sc0 ls0 ws
+        """
         soup = bs4.BeautifulSoup(StringIO(self.content), "html.parser")
-        return soup.text.strip()
+
+        content = []
+        for partial in soup.find_all("div", class_="t"):
+            content.append(partial.text.replace("", " ").strip())
+
+        if not content:
+            return soup.text.strip()
+
+        return "\n".join(content)
 
     @property
     def page_no(self):
