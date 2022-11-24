@@ -144,11 +144,7 @@ class VortexPDFTest_EX(TestCase):
 
     def test_pages(self):
         pdf = HTMLEX_PDF(path=self.PDF_PATH)
-        pdf.to_html()
-        pdf.modify_pages()
-        pdf.create_structure()
-        pdf.write_mimetype()
-        pdf.move_to_oebps()
+        pdf.to_epub(path="/tmp/pdf2epub_test.epub")
 
         self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
         self.assertEquals(
@@ -163,3 +159,9 @@ Comet
 Published in July 1941
 epubBooks.com""",
         )
+
+    @skip("Doesn't find the title")
+    def test_get_expected_title(self):
+        pdf = HTMLEX_PDF(path=self.PDF_PATH)
+        pdf.to_epub(path="/tmp/pdf2epub_test.epub")
+        self.assertEquals(pdf.get_expected_title(), "The Vortex Blaster")
