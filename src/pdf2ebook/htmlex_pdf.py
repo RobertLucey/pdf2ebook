@@ -167,14 +167,14 @@ class HTMLEX_PDF:
             content = f"""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <package xmlns=\"http://www.idpf.org/2007/opf\" prefix=\"rendition: http://www.idpf.org/vocab/rendition/#\" unique-identifier=\"pub-id\" version=\"3.0\">
   <metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\">
-    <dc:identifier id=\"pub-id\">isbn</dc:identifier>
-    <dc:title>title</dc:title>
-    <dc:creator>author</dc:creator>
-    <dc:publisher>publisher</dc:publisher>
+    <dc:identifier id=\"pub-id\">{self.get_isbn()}</dc:identifier>
+    <dc:title>{self.get_expected_title()}</dc:title>
+    <dc:creator>{self.get_authors()}</dc:creator>
+    <dc:publisher>{self.get_publisher()}</dc:publisher>
     <dc:language>{self.lang}</dc:language>
-    <dc:subject>tags</dc:subject>
-    <dc:date>year</dc:date>
-    <dc:description>description</dc:description>
+    <dc:subject></dc:subject>
+    <dc:date>{self.get_published_date()}</dc:date>
+    <dc:description></dc:description>
     <meta name=\"cover\" content=\"cover-image\"/>
     <meta property=\"dcterms:modified\">date</meta>
     <meta property=\"rendition:layout\">pre-paginated</meta>
@@ -353,3 +353,19 @@ class HTMLEX_PDF:
         if difflib.SequenceMatcher(None, filename_title, content_title).ratio() > 0.4:
             logger.debug("filename_title and content_title close enough")
             return content_title
+
+    def get_authors(self):
+        isbn = self.get_isbn()
+        if isbn:
+            return self.isbn_meta.get("Authors", [])
+        return []
+
+    def get_publisher(self):
+        isbn = self.get_isbn()
+        if isbn:
+            return self.isbn_meta.get("Publisher", None)
+
+    def get_published_date(self):
+        isbn = self.get_isbn()
+        if isbn:
+            return self.isbn_meta.get("Year", None)
