@@ -23,7 +23,7 @@ class HTMLPage(BasePage):
         try:
             soup.hr.decompose()
         except:
-            logger.warning("No hr tags found, expecting a single page document")
+            pass
 
         self.content = str(soup)
 
