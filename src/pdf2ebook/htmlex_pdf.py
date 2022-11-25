@@ -253,7 +253,7 @@ class HTMLEX_PDF:
             path_to_out_epub = os.path.join(dir_path, "converted_pdf.epub")
 
         os.system(
-            f"cd /tmp/book && zip -0Xq {path_to_out_epub} ./mimetype && zip -Xr9Dq {path_to_out_epub} ./* -x ./mimetype -x {path_to_out_epub}"
+            f"cd {self.ROOT} && zip -0Xq {path_to_out_epub} ./mimetype && zip -Xr9Dq {path_to_out_epub} ./* -x ./mimetype -x {path_to_out_epub}"
         )
 
         logger.debug(f"Epub saved: {path_to_out_epub}")
