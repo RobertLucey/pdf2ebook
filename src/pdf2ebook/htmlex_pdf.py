@@ -168,8 +168,8 @@ class HTMLEX_PDF:
 <package xmlns=\"http://www.idpf.org/2007/opf\" prefix=\"rendition: http://www.idpf.org/vocab/rendition/#\" unique-identifier=\"pub-id\" version=\"3.0\">
   <metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\">
     <dc:identifier id=\"pub-id\">{self.get_isbn()}</dc:identifier>
-    <dc:title>{self.get_expected_title()}</dc:title>
-    <dc:creator>{self.get_authors()}</dc:creator>
+    <dc:title>{self.get_title()}</dc:title>
+    <dc:creator>{', '.join(self.get_authors())}</dc:creator>
     <dc:publisher>{self.get_publisher()}</dc:publisher>
     <dc:language>{self.lang}</dc:language>
     <dc:subject></dc:subject>
