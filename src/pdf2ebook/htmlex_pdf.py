@@ -1,26 +1,15 @@
 import os
-import re
 import shutil
 import glob
 import uuid
-import difflib
-from collections import defaultdict
-
-import unicodedata
-import isbnlib
 
 from pdf2ebook import logger
 from pdf2ebook.html_page import HTMLPage
 from pdf2ebook.pages import HtmlPages
-from pdf2ebook.utils import window, get_isbn, isbns_from_words
+from pdf2ebook.base_pdf import BasePDF
 
 
-META_CACHE = defaultdict(dict)
-ISBN_CACHE = defaultdict(str)
-ISBNS_CACHE = defaultdict(list)
-
-
-class HTMLEX_PDF:
+class HTMLEX_PDF(BasePDF):
 
     ROOT = f"/tmp/{uuid.uuid4()}"
     META_INF = f"{ROOT}/META-INF"
@@ -36,10 +25,6 @@ class HTMLEX_PDF:
         self.dot_pages = []
         self.tmp_path = os.path.join("/tmp/", os.path.basename(self.pdf_path))
         shutil.copyfile(self.pdf_path, self.tmp_path)
-
-    @property
-    def content_hash(self):
-        return hash(sum([page.content_hash for page in self.pages]))
 
     def modify_pages(self):
         logger.info("Modifying pages")
@@ -195,15 +180,10 @@ class HTMLEX_PDF:
             # TODO: for png, svg, jpg as well as xhtml
 
             f.write(
-                '    <item id="base-min-css" href="base.min.css" media-type="text/css"/>'
-            )
-            f.write('    <item id="style-css" href="style.css" media-type="text/css"/>')
-            f.write(
-                '    <item id="cover-image" href="cover.png" media-type="image/png" properties="cover-image"/>'
-            )
-
-            f.write(
-                """    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+                """    <item id="base-min-css" href="base.min.css" media-type="text/css"/>
+    <item id="style-css" href="style.css" media-type="text/css"/>
+    <item id="cover-image" href="cover.png" media-type="image/png" properties="cover-image"/>
+    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
   </manifest>
   <spine>"""
             )
@@ -271,6 +251,8 @@ class HTMLEX_PDF:
 
             pages.append(HTMLPage(idx, content))
 
+        pages.set_context()
+
         return pages
 
     @property
@@ -278,94 +260,9 @@ class HTMLEX_PDF:
         content = []
         for page in self.pages:
             content.append(page.text_content)
-        return "\n".join(content)
+        return "\n".join(content).strip()
 
     @property
     def lang(self):
         langs = [page.lang for page in self.pages]
         return max(set(langs), key=langs.count)
-
-    def get_title(self):
-        if self._title:
-            return self._title
-        return self.isbn_meta.get("Title", None)
-
-    @property
-    def isbn_meta(self):
-        if self.content_hash in META_CACHE:
-            return META_CACHE[self.content_hash]
-        isbn = self.get_isbn()
-        if isbn:
-            data = isbnlib.meta(isbn)
-            META_CACHE[self.content_hash] = data
-        return META_CACHE[self.content_hash]
-
-    def get_isbn(self):
-        if self.content_hash in ISBN_CACHE:
-            return ISBN_CACHE[self.content_hash]
-
-        for page in self.pages:
-            isbn = get_isbn(page.cleaned_text_content)
-            if isbn:
-                try:
-                    isbnlib.meta(isbn)
-                except isbnlib._exceptions.NotValidISBNError:
-                    logger.warning(f"Not a valid ISBN: {isbn}")
-                else:
-                    ISBN_CACHE[self.content_hash] = isbn
-
-        if self.content_hash in ISBN_CACHE:
-            return ISBN_CACHE[self.content_hash]
-
-        expected_title = self.get_expected_title()
-        if expected_title:
-            logger.info(f"Guessing the isbn from title: {expected_title}")
-            ISBN_CACHE[self.content_hash] = isbnlib.isbn_from_words(expected_title)
-
-        return ISBN_CACHE[self.content_hash]
-
-    def get_expected_title(self):
-        if self._title:
-            return self._title
-
-        # Assert page no removed first
-
-        # Maybe check the first line of the second page too
-
-        filename = os.path.splitext(os.path.basename(self.pdf_path))[0]
-        filename = filename.replace("_", " ").lower()
-        filename_title = filename
-        # if by... remove by... to just get the title
-        filename_title = re.sub("([- ]by[-: ].*)", "", filename_title)
-
-        content_title = ""
-        clean_content = self.pages[0].cleaned_text_content.lower()
-        found_idx = None
-        for idx, line in enumerate(clean_content.split("\n")):
-            if line.startswith("by:") or line.startswith("by ") or line == "by":
-                found_idx = idx
-
-        if found_idx is not None:
-            possible_title = "\n".join(clean_content.split("\n")[:found_idx]).strip()
-            logger.debug(f"Guessing the title from page content is: {possible_title}")
-            content_title = unicodedata.normalize("NFKD", possible_title.strip())
-
-        if difflib.SequenceMatcher(None, filename_title, content_title).ratio() > 0.4:
-            logger.debug("filename_title and content_title close enough")
-            return content_title
-
-    def get_authors(self):
-        isbn = self.get_isbn()
-        if isbn:
-            return self.isbn_meta.get("Authors", [])
-        return []
-
-    def get_publisher(self):
-        isbn = self.get_isbn()
-        if isbn:
-            return self.isbn_meta.get("Publisher", None)
-
-    def get_published_date(self):
-        isbn = self.get_isbn()
-        if isbn:
-            return self.isbn_meta.get("Year", None)
