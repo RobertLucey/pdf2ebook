@@ -19,6 +19,10 @@ jobs:
         python-version: '3.10'
     - name: Install dependencies
       run: |
+        sudo echo "deb [trusted=yes] https://repository.dodeeric.be/apt/ /" > /tmp/dodeeric.list
+        sudo mv /tmp/dodeeric.list /etc/apt/sources.list.d/
+        sudo apt update
+        sudo apt install pdf2epubex
         sudo apt-get install make pdftohtml
         python -m pip install --upgrade pip
         python -m pip install virtualenv
@@ -37,6 +41,10 @@ jobs:
         python-version: '3.10'
     - name: Install dependencies
       run: |
+        sudo echo "deb [trusted=yes] https://repository.dodeeric.be/apt/ /" > /tmp/dodeeric.list
+        sudo mv /tmp/dodeeric.list /etc/apt/sources.list.d/
+        sudo apt update
+        sudo apt install pdf2epubex
         sudo apt-get install make pdftohtml
         python -m pip install --upgrade pip
         python -m pip install virtualenv
