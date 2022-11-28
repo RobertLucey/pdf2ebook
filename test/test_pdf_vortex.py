@@ -1,8 +1,11 @@
 import os
+import unicodedata
 
+from mock import patch
 from unittest import TestCase, skip
 
 from pdf2ebook.pdf import PDF
+from pdf2ebook.htmlex_pdf import HTMLEX_PDF
 
 
 class VortexPDFTest(TestCase):
@@ -125,3 +128,40 @@ epubBooks.com""",
         pdf.load()
         self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
         self.assertGreater(os.path.getsize(f"/tmp/{self.EPUB_NAME}"), 0)
+
+
+class VortexPDFTest_EX(TestCase):
+
+    PDF_PATH = "test/resources/vortex_blaster.pdf"
+    EPUB_NAME = "test_vortex.epub"
+    EXPECTED_PAGES = 17
+
+    def test_page_numbers(self):
+        pdf = HTMLEX_PDF(path=self.PDF_PATH)
+        pdf.to_html()
+        pdf.modify_pages()
+        self.assertEquals(len(list(pdf.dot_pages)), self.EXPECTED_PAGES)
+
+    def test_pages(self):
+        pdf = HTMLEX_PDF(path=self.PDF_PATH)
+        pdf.to_epub(path="/tmp/pdf2epub_test.epub")
+
+        self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
+        self.assertEquals(
+            pdf.pages[0].text_content,
+            """INTRODUCING "Storm" Cloud, who, through tragedy, is destined to become the most noted figure in the
+galaxy—
+The Vortex Blaster
+***
+E. E. SMITH, Ph.D.
+Author of "The Skylark,""Skylark Three,""The Skylark of Valeron," the Lensman stories, etc.
+Comet
+Published in July 1941
+epubBooks.com""",
+        )
+
+    @skip("Doesn't find the title")
+    def test_get_expected_title(self):
+        pdf = HTMLEX_PDF(path=self.PDF_PATH)
+        pdf.to_epub(path="/tmp/pdf2epub_test.epub")
+        self.assertEquals(pdf.get_expected_title(), "The Vortex Blaster")

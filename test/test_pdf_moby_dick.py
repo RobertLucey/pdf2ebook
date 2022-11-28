@@ -1,5 +1,6 @@
 import os
 
+from mock import patch
 from unittest import TestCase
 
 from pdf2ebook.pdf import PDF

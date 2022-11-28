@@ -31,3 +31,6 @@ SOURCES/
 *.html
 *.epub
 *.txt
+
+*.outline
+*.js

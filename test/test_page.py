@@ -120,3 +120,21 @@ class HTMLPageTest(TestCase):
         page = HTMLPage(0, "<p>something</p>\nBlah blah</br>")
         page.remove_footer("Blah blah")
         self.assertEquals(page.text_content, "something")
+
+
+class HTMLExPageTest(TestCase):
+    @skip("Need to implement")
+    def test_page_no(self):
+        pass
+
+    @skip("Need to implement")
+    def test_html_content(self):
+        pass
+
+    @skip("Need to implement")
+    def test_remove_header(self):
+        pass
+
+    @skip("Need to implement")
+    def test_remove_footer(self):
+        pass
