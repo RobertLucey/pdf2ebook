@@ -215,7 +215,7 @@ class HTMLEX_PDF(BasePDF):
     def to_html(self):
         if is_local_htmlex_ok():
             os.system(
-                "pdf2htmlEX --quiet 1 --embed-css 0 --embed-font 0 --embed-image 0 --embed-javascript 0 --embed-outline 0 --split-pages 1 --page-filename convertedbook%04d.page --dest-dir {self.tmp_dir}--css-filename style.css {self.tmp_path}"
+                f"pdf2htmlEX --quiet 1 --embed-css 0 --embed-font 0 --embed-image 0 --embed-javascript 0 --embed-outline 0 --split-pages 1 --page-filename convertedbook%04d.page --dest-dir {self.tmp_dir} --css-filename style.css {self.tmp_path}"
             )
         elif is_docker_installed():
             os.system(
