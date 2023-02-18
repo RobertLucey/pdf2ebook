@@ -1,8 +1,8 @@
 import argparse
-from shutil import which
 
 from pdf2ebook import logger
 
+from pdf2ebook.utils import is_local_htmlex_ok, is_docker_installed
 from pdf2ebook.pdf import PDF
 from pdf2ebook.htmlex_pdf import HTMLEX_PDF
 
@@ -42,7 +42,7 @@ def main():
         args.force_html = None
 
     if args.force_html_ex or (
-        which("pdf2htmlEX") and not args.force_html and not args.force_text
+        (is_local_htmlex_ok() or is_docker_installed()) and not args.force_html and not args.force_text
     ):
         pdf = HTMLEX_PDF(
             path=args.in_file,

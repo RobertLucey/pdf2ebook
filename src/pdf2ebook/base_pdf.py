@@ -26,7 +26,19 @@ class BasePDF:
             return META_CACHE[self.content_hash]
         isbn = self.get_isbn()
         if isbn:
-            data = isbnlib.meta(isbn)
+            data = None
+            for service in isbnlib._metadata.get_services().keys():
+                try:
+                    data = isbnlib.meta(isbn, service=service)
+                except isbnlib.dev._exceptions.ISBNNotConsistentError:
+                    pass
+                else:
+                    if data:
+                        break
+
+            if not data:
+                raise Exception('Could not get isbn meta')
+
             META_CACHE[self.content_hash] = data
         return META_CACHE[self.content_hash]
 
@@ -68,13 +80,16 @@ class BasePDF:
 
         for page in self.pages:
             isbn = get_isbn(page.cleaned_text_content)
-            if isbn:
+
+            for service in isbnlib._metadata.get_services().keys():
                 try:
-                    isbnlib.meta(isbn)
+                    data = isbnlib.meta(isbn, service=service)
                 except isbnlib._exceptions.NotValidISBNError:
-                    logger.warning(f"Not a valid ISBN: {isbn}")
+                    pass
                 else:
-                    ISBN_CACHE[self.content_hash] = isbn
+                    if data:
+                        ISBNS_CACHE[self.content_hash].append(isbn)
+                        break
 
         if self.content_hash in ISBN_CACHE:
             return ISBN_CACHE[self.content_hash]
@@ -92,13 +107,16 @@ class BasePDF:
 
         for page in self.pages:
             isbn = get_isbn(page.cleaned_text_content)
-            if isbn:
+
+            for service in isbnlib._metadata.get_services().keys():
                 try:
-                    isbnlib.meta(isbn)
+                    data = isbnlib.meta(isbn, service=service)
                 except isbnlib._exceptions.NotValidISBNError:
-                    logger.warning(f"Not a valid ISBN: {isbn}")
+                    pass
                 else:
-                    ISBNS_CACHE[self.content_hash].append(isbn)
+                    if data:
+                        ISBNS_CACHE[self.content_hash].append(isbn)
+                        break
 
         expected_title = self.get_expected_title()
         if expected_title:

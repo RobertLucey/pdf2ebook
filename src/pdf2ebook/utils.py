@@ -1,4 +1,6 @@
 import re
+import os
+from shutil import which
 from itertools import islice
 
 try:  # pragma: no cover
@@ -54,3 +56,14 @@ def isbns_from_words(words):
         },
     )
     return get_isbnlike(content)
+
+
+def is_local_htmlex_ok():
+    if not which("pdf2htmlEX"):
+        return
+
+    return os.system("pdf2htmlEX --version") == 0
+
+
+def is_docker_installed():
+    return bool(which('docker'))

@@ -1,7 +1,6 @@
 import os
 import urllib.request
 from io import StringIO
-from shutil import which
 
 import bs4
 from ebooklib import epub
@@ -9,6 +8,7 @@ from ebooklib.plugins import standard
 from cached_property import cached_property
 
 from pdf2ebook import logger
+from pdf2ebook.utils import is_local_htmlex_ok, is_docker_installed
 from pdf2ebook.text_page import TextPage
 from pdf2ebook.html_page import HTMLPage
 from pdf2ebook.pages import TextPages, HtmlPages
@@ -194,7 +194,7 @@ class PDF(BasePDF):
         if self._use_html_ex is not None:
             return self._use_html_ex
 
-        return which("pdf2htmlEX") is not None
+        return is_local_htmlex_ok() or is_docker_installed()
 
     @cached_property
     def pages(self):

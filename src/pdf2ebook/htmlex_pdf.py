@@ -4,6 +4,7 @@ import glob
 import uuid
 
 from pdf2ebook import logger
+from pdf2ebook.utils import is_local_htmlex_ok, is_docker_installed
 from pdf2ebook.html_page import HTMLPage
 from pdf2ebook.pages import HtmlPages
 from pdf2ebook.base_pdf import BasePDF
@@ -23,12 +24,14 @@ class HTMLEX_PDF(BasePDF):
         self._title = kwargs.get("title", None)
         self.pdf_path = kwargs["path"]
         self.dot_pages = []
-        self.tmp_path = os.path.join("/tmp/", os.path.basename(self.pdf_path))
+        self.tmp_dir = f"/tmp/{os.path.basename(self.pdf_path)}_{uuid.uuid4()}"
+        os.mkdir(self.tmp_dir)
+        self.tmp_path = os.path.join(self.tmp_dir, os.path.basename(self.pdf_path))
         shutil.copyfile(self.pdf_path, self.tmp_path)
 
     def modify_pages(self):
         logger.info("Modifying pages")
-        for page in sorted(os.listdir()):
+        for page in sorted(os.listdir(self.tmp_dir)):
             if not page.endswith(".page"):
                 continue
             head = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -43,7 +46,7 @@ class HTMLEX_PDF(BasePDF):
   </head>
 <body>
 <div id=\"page-container\">"""
-            page_content = open(page, "r").read()
+            page_content = open(os.path.join(self.tmp_dir, page), "r").read()
             foot = """</div>
 </body>
 </html>"""
@@ -210,9 +213,16 @@ class HTMLEX_PDF(BasePDF):
         shutil.move("cover.png", self.OEBPS)
 
     def to_html(self):
-        os.system(
-            f"pdf2htmlEX --quiet 1 --embed-css 0 --embed-font 0 --embed-image 0 --embed-javascript 0 --embed-outline 0 --split-pages 1 --page-filename convertedbook%04d.page --css-filename style.css {self.tmp_path}"
-        )
+        if is_local_htmlex_ok():
+            os.system(
+                "pdf2htmlEX --quiet 1 --embed-css 0 --embed-font 0 --embed-image 0 --embed-javascript 0 --embed-outline 0 --split-pages 1 --page-filename convertedbook%04d.page --dest-dir {self.tmp_dir}--css-filename style.css {self.tmp_path}"
+            )
+        elif is_docker_installed():
+            os.system(
+                f"docker run -ti --rm -v {self.tmp_dir}:/pdf bwits/pdf2htmlex pdf2htmlEX --embed-css 0 --embed-font 0 --embed-image 0 --embed-javascript 0 --embed-outline 0 --split-pages 1 --page-filename convertedbook%04d.page --css-filename style.css {os.path.basename(self.tmp_path)}"
+            )
+        else:
+            raise Exception('Could not execute pdf2htmlex')
 
     def to_epub(self, path=None):
         self.to_html()

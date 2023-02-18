@@ -81,7 +81,10 @@ class HTMLPage(BasePage):
 
         content = []
         for partial in soup.find_all("div", class_="t"):
-            content.append(partial.text.replace("", " ").strip())
+            text = partial.text
+            text = text.replace("", " ").strip()
+            text = text.replace("\ue003", " ")
+            content.append(text)
 
         if not content:
             return soup.text.strip()

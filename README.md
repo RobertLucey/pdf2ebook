@@ -13,6 +13,8 @@ PDFToHTML - `sudo apt install pdftohtml`
 
 pdf2epubEX (recommended) - https://github.com/dodeeric/pdf2epubEX
 
+Docker (if you don't want to install pdf2epubEX directly)
+
 
 Installation
 ------------
