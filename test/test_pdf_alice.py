@@ -169,9 +169,9 @@ feel very sleepy and stupid), whether the pleasure of making a daisy-chain wo
             pass
         pdf.to_epub(f"/tmp/{self.EPUB_NAME}")
         self.assertTrue(os.path.exists(f"/tmp/{self.EPUB_NAME}"))
+        self.assertGreater(os.path.getsize(f"/tmp/{self.EPUB_NAME}"), 0)
 
     def test_to_html(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
-        self.assertGreater(os.path.getsize(f"/tmp/{self.EPUB_NAME}"), 0)
