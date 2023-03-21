@@ -62,3 +62,6 @@ class BasePage:
 
     def set_next_page(self, next_page):
         self.next_page = next_page
+
+    def page_no(self):
+        raise NotImplementedError()

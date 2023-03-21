@@ -10,7 +10,8 @@ INSTALL_REQUIRES = (
     'bs4',
     'langdetect',
     'cached_property',
-    'boltons'
+    'boltons',
+    'google',
 )
 
 setup(

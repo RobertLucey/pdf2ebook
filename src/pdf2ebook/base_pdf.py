@@ -7,7 +7,7 @@ from collections import defaultdict
 import isbnlib
 
 from pdf2ebook import logger
-from pdf2ebook.utils import get_isbn, isbns_from_words
+from pdf2ebook.utils import get_isbn, isbns_from_words, get_isbn_from_content
 
 
 META_CACHE = defaultdict(dict)
@@ -74,9 +74,14 @@ class BasePDF:
             logger.debug("filename_title and content_title close enough")
             return content_title
 
-    def get_isbn(self):
-        if self.content_hash in ISBN_CACHE:
-            return ISBN_CACHE[self.content_hash]
+    def get_isbn(self, multi=False):
+
+        if multi:
+            if self.content_hash in ISBNS_CACHE:
+                return ISBNS_CACHE[self.content_hash]
+        else:
+            if self.content_hash in ISBN_CACHE:
+                return ISBN_CACHE[self.content_hash]
 
         for page in self.pages:
             isbn = get_isbn(page.cleaned_text_content)
@@ -88,42 +93,41 @@ class BasePDF:
                     pass
                 else:
                     if data:
-                        ISBNS_CACHE[self.content_hash].append(isbn)
-                        break
+                        if multi:
+                            ISBNS_CACHE[self.content_hash].append(isbn)
+                            break
+                        else:
+                            ISBN_CACHE[self.content_hash] = isbn
+                            break
 
-        if self.content_hash in ISBN_CACHE:
-            return ISBN_CACHE[self.content_hash]
-
-        expected_title = self.get_expected_title()
-        if expected_title:
-            logger.info(f"Guessing the isbn from title: {expected_title}")
-            ISBN_CACHE[self.content_hash] = isbnlib.isbn_from_words(expected_title)
-
-        return ISBN_CACHE[self.content_hash]
-
-    def get_isbns(self):
-        if self.content_hash in ISBNS_CACHE:
-            return ISBNS_CACHE[self.content_hash]
-
-        for page in self.pages:
-            isbn = get_isbn(page.cleaned_text_content)
-
-            for service in isbnlib._metadata.get_services().keys():
-                try:
-                    data = isbnlib.meta(isbn, service=service)
-                except isbnlib._exceptions.NotValidISBNError:
-                    pass
-                else:
-                    if data:
-                        ISBNS_CACHE[self.content_hash].append(isbn)
-                        break
+        if not multi:
+            if self.content_hash in ISBN_CACHE:
+                return ISBN_CACHE[self.content_hash]
 
         expected_title = self.get_expected_title()
         if expected_title:
             logger.info(f"Guessing the isbn from title: {expected_title}")
-            ISBNS_CACHE[self.content_hash].extend(isbns_from_words(expected_title))
+            if multi:
+                ISBNS_CACHE[self.content_hash].extend(isbns_from_words(expected_title))
+            else:
+                ISBN_CACHE[self.content_hash] = isbnlib.isbn_from_words(expected_title)
 
-        return ISBNS_CACHE[self.content_hash]
+        if multi:
+            if self.content_hash in ISBNS_CACHE:
+                return ISBNS_CACHE[self.content_hash]
+            else:
+                logger.warning('Could not get isbn')
+                ISBNS_CACHE[self.content_hash] = [get_isbn_from_content(self.pages[0].text_content)]
+                if ISBNS_CACHE[self.content_hash]:
+                    return ISBNS_CACHE[self.content_hash]
+        else:
+            if self.content_hash in ISBN_CACHE:
+                return ISBN_CACHE[self.content_hash]
+            else:
+                logger.warning('Could not get isbn')
+                ISBN_CACHE[self.content_hash] = get_isbn_from_content(self.pages[0].text_content)
+                if ISBN_CACHE[self.content_hash]:
+                    return ISBN_CACHE[self.content_hash]
 
     def get_authors(self):
         isbn = self.get_isbn()
@@ -137,10 +141,15 @@ class BasePDF:
         return self.isbn_meta.get("Title", None)
 
     def get_thumbnail_url(self):
-        for isbn in self.get_isbns():
+        isbns = self.get_isbn(multi=True)
+        isbns = [isbn for isbn in isbns if isbn] if isbns else []
+        for isbn in isbns:
             thumbnail = isbnlib.cover(isbn).get("thumbnail", None)
             if thumbnail:
                 return thumbnail
+            else:
+                logger.warning('Could not get thumbnail')
+                # TODO: Get from google images or something
 
     def get_publisher(self):
         isbn = self.get_isbn()

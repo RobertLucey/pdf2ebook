@@ -2,6 +2,11 @@ import re
 import os
 from shutil import which
 from itertools import islice
+from urllib.request import urlopen
+
+import bs4
+from googlesearch import search
+
 
 try:  # pragma: no cover
     from urllib.parse import quote
@@ -16,10 +21,18 @@ ISBN_PATTERN = re.compile(ISBN_REGEX, re.UNICODE)
 
 
 def get_isbn(text):
+    isbns = get_isbns(text)
+    if isbns:
+        return isbns[0]
+
+
+def get_isbns(text):
     text = re.sub(r"\s+", "", text, flags=re.UNICODE)
     matches = ISBN_PATTERN.findall(text)
-    if matches:
-        return matches[0]
+    for match in matches:
+        while match.endswith('-'):
+            match = match[:-1]
+    return matches
 
 
 def window(sequence, window_size=2):
@@ -67,3 +80,28 @@ def is_local_htmlex_ok():
 
 def is_docker_installed():
     return bool(which('docker'))
+
+
+def get_isbn_from_content(content, engine="google"):
+    for url_result in search(content, stop=10):
+        url_isbn = get_isbn(url_result)
+        if url_isbn:
+            return url_isbn
+
+        # if it ends in .pdf we can skip, likely what we have
+        if url_result.endswith('.pdf'):
+            continue
+
+        source = urlopen(url_result)
+        soup = bs4.BeautifulSoup(source, 'html.parser')
+
+        title_isbn = get_isbn(soup.title.text)
+        if title_isbn:
+            return title_isbn
+
+        content_isbns = get_isbns(soup.text)
+        if len(content_isbns) > 1:
+            # TODO: be smarter, may ref other books
+            pass
+        elif len(content_isbns) == 1:
+            return content_isbns[0]
