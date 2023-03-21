@@ -37,7 +37,7 @@ class BasePDF:
                         break
 
             if not data:
-                raise Exception('Could not get isbn meta')
+                raise Exception("Could not get isbn meta")
 
             META_CACHE[self.content_hash] = data
         return META_CACHE[self.content_hash]
@@ -75,7 +75,6 @@ class BasePDF:
             return content_title
 
     def get_isbn(self, multi=False):
-
         if multi:
             if self.content_hash in ISBNS_CACHE:
                 return ISBNS_CACHE[self.content_hash]
@@ -116,16 +115,20 @@ class BasePDF:
             if self.content_hash in ISBNS_CACHE:
                 return ISBNS_CACHE[self.content_hash]
             else:
-                logger.warning('Could not get isbn')
-                ISBNS_CACHE[self.content_hash] = [get_isbn_from_content(self.pages[0].text_content)]
+                logger.warning("Could not get isbn")
+                ISBNS_CACHE[self.content_hash] = [
+                    get_isbn_from_content(self.pages[0].text_content)
+                ]
                 if ISBNS_CACHE[self.content_hash]:
                     return ISBNS_CACHE[self.content_hash]
         else:
             if self.content_hash in ISBN_CACHE:
                 return ISBN_CACHE[self.content_hash]
             else:
-                logger.warning('Could not get isbn')
-                ISBN_CACHE[self.content_hash] = get_isbn_from_content(self.pages[0].text_content)
+                logger.warning("Could not get isbn")
+                ISBN_CACHE[self.content_hash] = get_isbn_from_content(
+                    self.pages[0].text_content
+                )
                 if ISBN_CACHE[self.content_hash]:
                     return ISBN_CACHE[self.content_hash]
 
@@ -148,7 +151,7 @@ class BasePDF:
             if thumbnail:
                 return thumbnail
             else:
-                logger.warning('Could not get thumbnail')
+                logger.warning("Could not get thumbnail")
                 # TODO: Get from google images or something
 
     def get_publisher(self):

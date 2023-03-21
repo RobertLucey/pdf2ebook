@@ -7,7 +7,6 @@ from pdf2ebook.pdf import PDF
 
 
 class MobyDickPDFTest(TestCase):
-
     PDF_PATH = "test/resources/moby_dick.pdf"
     EPUB_NAME = "test_moby_dick.epub"
     EXPECTED_PAGES = 7

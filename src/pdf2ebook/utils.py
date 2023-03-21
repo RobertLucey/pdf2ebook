@@ -30,7 +30,7 @@ def get_isbns(text):
     text = re.sub(r"\s+", "", text, flags=re.UNICODE)
     matches = ISBN_PATTERN.findall(text)
     for match in matches:
-        while match.endswith('-'):
+        while match.endswith("-"):
             match = match[:-1]
     return matches
 
@@ -79,7 +79,7 @@ def is_local_htmlex_ok():
 
 
 def is_docker_installed():
-    return bool(which('docker'))
+    return bool(which("docker"))
 
 
 def get_isbn_from_content(content, engine="google"):
@@ -89,11 +89,11 @@ def get_isbn_from_content(content, engine="google"):
             return url_isbn
 
         # if it ends in .pdf we can skip, likely what we have
-        if url_result.endswith('.pdf'):
+        if url_result.endswith(".pdf"):
             continue
 
         source = urlopen(url_result)
-        soup = bs4.BeautifulSoup(source, 'html.parser')
+        soup = bs4.BeautifulSoup(source, "html.parser")
 
         title_isbn = get_isbn(soup.title.text)
         if title_isbn:

@@ -7,7 +7,6 @@ from pdf2ebook.pdf import PDF
 
 
 class RoomWithAViewPDFTest(TestCase):
-
     PDF_PATH = "test/resources/room_with_a_view.pdf"
     EPUB_NAME = "test_room_with_a_view.epub"
     EXPECTED_PAGES = 151

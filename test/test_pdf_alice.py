@@ -7,7 +7,6 @@ from pdf2ebook.pdf import PDF
 
 
 class AlicePDFTest(TestCase):
-
     PDF_PATH = "test/resources/alice_in_wonderland.pdf"
     EPUB_NAME = "test_alice.epub"
     EXPECTED_PAGES = 21

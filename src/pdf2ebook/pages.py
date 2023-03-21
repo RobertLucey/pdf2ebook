@@ -123,7 +123,6 @@ class HtmlPages(BasePages):
                 return line
 
     def set_page_number_position(self):
-
         # FIXME: For html use tag context rather than just text
 
         top_matches = 0

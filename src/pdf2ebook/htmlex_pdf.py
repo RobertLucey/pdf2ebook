@@ -11,7 +11,6 @@ from pdf2ebook.base_pdf import BasePDF
 
 
 class HTMLEX_PDF(BasePDF):
-
     ROOT = f"/tmp/{uuid.uuid4()}"
     META_INF = f"{ROOT}/META-INF"
     OEBPS = f"{ROOT}/OEBPS"
@@ -222,7 +221,7 @@ class HTMLEX_PDF(BasePDF):
                 f"docker run -ti --rm -v {self.tmp_dir}:/pdf bwits/pdf2htmlex pdf2htmlEX --embed-css 0 --embed-font 0 --embed-image 0 --embed-javascript 0 --embed-outline 0 --split-pages 1 --page-filename convertedbook%04d.page --css-filename style.css {os.path.basename(self.tmp_path)}"
             )
         else:
-            raise Exception('Could not execute pdf2htmlex')
+            raise Exception("Could not execute pdf2htmlex")
 
     def to_epub(self, path=None):
         self.to_html()

@@ -9,7 +9,6 @@ from pdf2ebook.htmlex_pdf import HTMLEX_PDF
 
 
 class VortexPDFTest(TestCase):
-
     PDF_PATH = "test/resources/vortex_blaster.pdf"
     EPUB_NAME = "test_vortex.epub"
     EXPECTED_PAGES = 16
@@ -131,7 +130,6 @@ epubBooks.com""",
 
 
 class VortexPDFTest_EX(TestCase):
-
     PDF_PATH = "test/resources/vortex_blaster.pdf"
     EPUB_NAME = "test_vortex.epub"
     EXPECTED_PAGES = 17
