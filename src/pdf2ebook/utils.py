@@ -7,6 +7,8 @@ from urllib.request import urlopen
 import bs4
 from googlesearch import search
 
+from pdf2ebook import logger
+
 
 try:  # pragma: no cover
     from urllib.parse import quote
@@ -92,16 +94,19 @@ def get_isbn_from_content(content, engine="google"):
         if url_result.endswith(".pdf"):
             continue
 
-        source = urlopen(url_result)
-        soup = bs4.BeautifulSoup(source, "html.parser")
+        try:
+            source = urlopen(url_result)
+            soup = bs4.BeautifulSoup(source, "html.parser")
 
-        title_isbn = get_isbn(soup.title.text)
-        if title_isbn:
-            return title_isbn
+            title_isbn = get_isbn(soup.title.text)
+            if title_isbn:
+                return title_isbn
 
-        content_isbns = get_isbns(soup.text)
-        if len(content_isbns) > 1:
-            # TODO: be smarter, may ref other books
-            pass
-        elif len(content_isbns) == 1:
-            return content_isbns[0]
+            content_isbns = get_isbns(soup.text)
+            if len(content_isbns) > 1:
+                # TODO: be smarter, may ref other books
+                pass
+            elif len(content_isbns) == 1:
+                return content_isbns[0]
+        except Exception as ex:
+            logger.warning(f"Could not search for isbn from content: {ex}")
