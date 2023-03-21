@@ -6,6 +6,7 @@ from urllib.request import urlopen
 
 import bs4
 from googlesearch import search
+import isbnlib
 
 from pdf2ebook import logger
 
@@ -110,3 +111,7 @@ def get_isbn_from_content(content, engine="google"):
                 return content_isbns[0]
         except Exception as ex:
             logger.warning(f"Could not search for isbn from content: {ex}")
+
+
+def get_thumbnail_url_from_isbn(isbn):
+    return isbnlib.cover(isbn).get("thumbnail", None)

@@ -7,7 +7,12 @@ from collections import defaultdict
 import isbnlib
 
 from pdf2ebook import logger
-from pdf2ebook.utils import get_isbn, isbns_from_words, get_isbn_from_content
+from pdf2ebook.utils import (
+    get_isbn,
+    isbns_from_words,
+    get_isbn_from_content,
+    get_thumbnail_url_from_isbn,
+)
 
 
 META_CACHE = defaultdict(dict)
@@ -24,17 +29,30 @@ class BasePDF:
     def isbn_meta(self):
         if self.content_hash in META_CACHE:
             return META_CACHE[self.content_hash]
-        isbn = self.get_isbn()
-        if isbn:
+        isbns = self.get_isbn(multi=True)
+        if isbns:
             data = None
-            for service in isbnlib._metadata.get_services().keys():
-                try:
-                    data = isbnlib.meta(isbn, service=service)
-                except isbnlib.dev._exceptions.ISBNNotConsistentError:
-                    pass
-                else:
-                    if data:
-                        break
+            for isbn in isbns:
+                for service in isbnlib._metadata.get_services().keys():
+                    try:
+                        data = isbnlib.meta(isbn, service=service)
+                    except isbnlib.dev._exceptions.ISBNNotConsistentError:
+                        logger.warning(f"ISBN is not consistent: {isbn}")
+                    except isbnlib._exceptions.NotValidISBNError:
+                        logger.warning(f"ISBN is not valid: {isbn}")
+                    except isbnlib.dev._exceptions.DataNotFoundAtServiceError:
+                        logger.warning(
+                            f"ISBN data not found at service ({service}): {isbn}"
+                        )
+                    except isbnlib.dev._exceptions.ISBNLibHTTPError:
+                        logger.warning(f"ISBNLib HTTP Error ({service}): {isbn}")
+                    else:
+                        if data:
+                            logger.debug(f"Found ISBNLib data ({isbn}): {data}")
+                            break
+
+                if data:
+                    break
 
             if not data:
                 raise Exception("Could not get isbn meta")
@@ -89,7 +107,7 @@ class BasePDF:
                 try:
                     data = isbnlib.meta(isbn, service=service)
                 except isbnlib._exceptions.NotValidISBNError:
-                    pass
+                    logger.warning(f"ISBN is not valid: {isbn}")
                 else:
                     if data:
                         if multi:
@@ -143,17 +161,6 @@ class BasePDF:
             return self._title
         return self.isbn_meta.get("Title", None)
 
-    def get_thumbnail_url(self):
-        isbns = self.get_isbn(multi=True)
-        isbns = [isbn for isbn in isbns if isbn] if isbns else []
-        for isbn in isbns:
-            thumbnail = isbnlib.cover(isbn).get("thumbnail", None)
-            if thumbnail:
-                return thumbnail
-            else:
-                logger.warning("Could not get thumbnail")
-                # TODO: Get from google images or something
-
     def get_publisher(self):
         isbn = self.get_isbn()
         if isbn:
@@ -163,3 +170,14 @@ class BasePDF:
         isbn = self.get_isbn()
         if isbn:
             return self.isbn_meta.get("Year", None)
+
+    def get_thumbnail_url(self):
+        isbns = self.get_isbn(multi=True)
+        isbns = [isbn for isbn in isbns if isbn] if isbns else []
+        for isbn in isbns:
+            thumbnail_url = get_thumbnail_url_from_isbn(isbn)
+            if thumbnail_url:
+                return thumbnail_url
+
+        # TODO: Get from google images or something
+        logger.warning("Could not get cover thumbnail")
