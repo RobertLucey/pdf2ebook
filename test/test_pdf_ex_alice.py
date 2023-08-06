@@ -36,17 +36,17 @@ class AlicePDFEXTest(TestCase):
                 page.remove_header(header)
                 page.remove_footer(footer)
 
-        self.assertEquals(pdf.get_expected_title(), "alice's adventures in wonderland")
+        self.assertEqual(pdf.get_expected_title(), "alice's adventures in wonderland")
 
     def test_detect_footer(self):
         pdf = HTMLEX_PDF(path=self.PDF_PATH)
         pdf.to_epub(path=f"/tmp/{self.EPUB_NAME}")
-        self.assertEquals(pdf.pages.detect_footer(), None)
+        self.assertEqual(pdf.pages.detect_footer(), None)
 
     def test_detect_header(self):
         pdf = HTMLEX_PDF(path=self.PDF_PATH)
         pdf.to_epub(path=f"/tmp/{self.EPUB_NAME}")
-        self.assertEquals(pdf.pages.detect_header(), None)
+        self.assertEqual(pdf.pages.detect_header(), None)
 
     @skip("complex xml, skipping for now")
     def test_remove_page_number(self):
@@ -54,7 +54,7 @@ class AlicePDFEXTest(TestCase):
         pdf.to_epub(path=f"/tmp/{self.EPUB_NAME}")
         pdf.pages.set_page_number_position()
         pdf.pages[0].remove_page_number()
-        self.assertEquals(
+        self.assertEqual(
             pdf.pages[0].content,
             """<b>Alice's Adventures in Wonderland </b><br/>
 <b>by </b><br/>
@@ -77,14 +77,14 @@ feel very sleepy and stupid), whether the pleasure of making a daisy-chain wo
         pdf = HTMLEX_PDF(path=self.PDF_PATH)
         pdf.to_epub(path=f"/tmp/{self.EPUB_NAME}")
         pdf.pages.set_page_number_position()
-        self.assertEquals(pdf.pages[0].page_number_position, "top")
+        self.assertEqual(pdf.pages[0].page_number_position, "top")
 
     @skip("page number functionality not yet implemented")
     def test_page_without_page_no(self):
         pdf = HTMLEX_PDF(path=self.PDF_PATH)
         pdf.to_epub(path=f"/tmp/{self.EPUB_NAME}")
         pdf.pages.set_page_number_position()
-        self.assertEquals(
+        self.assertEqual(
             pdf.pages[0].text_content_without_page_no.strip(),
             """Alice's Adventures in Wonderland
 by
@@ -106,7 +106,7 @@ feel very sleepy and stupid), whether the pleasure of making a daisy-chain wo
         pdf = HTMLEX_PDF(path=self.PDF_PATH)
         pdf.to_epub(path=f"/tmp/{self.EPUB_NAME}")
 
-        self.assertEquals(
+        self.assertEqual(
             pdf.pages._data[0].text_content.strip().replace("\xa0", " "),
             """1
 Alice's Adventures in Wonderland
@@ -131,7 +131,7 @@ feel very sleepy and stupid), whether the pleasure of making a daisy-chain wo
         pdf = HTMLEX_PDF(path=self.PDF_PATH)
         pdf.to_epub(path=f"/tmp/{self.EPUB_NAME}")
 
-        self.assertEquals(
+        self.assertEqual(
             pdf.pages._data[0].cleaned_text_content.strip().replace("\xa0", " "),
             """1
 Alice's Adventures in Wonderland
@@ -158,12 +158,12 @@ feel very sleepy and stupid), whether the pleasure of making a daisy-chain wo
         pdf.to_epub(path=f"/tmp/{self.EPUB_NAME}")
         for i in range(len(pdf.pages)):
             if i == len(pdf.pages) - 1:
-                self.assertEquals(
+                self.assertEqual(
                     pdf.pages._data[i].next_page,
                     None,
                 )
             else:
-                self.assertEquals(
+                self.assertEqual(
                     pdf.pages._data[i].next_page.idx,
                     pdf.pages._data[i + 1].idx,
                 )
@@ -181,5 +181,5 @@ feel very sleepy and stupid), whether the pleasure of making a daisy-chain wo
     def test_to_html(self):
         pdf = HTMLEX_PDF(path=self.PDF_PATH)
         pdf.to_epub(path=f"/tmp/{self.EPUB_NAME}")
-        self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
+        self.assertEqual(len(pdf.pages), self.EXPECTED_PAGES)
         self.assertGreater(os.path.getsize(f"/tmp/{self.EPUB_NAME}"), 0)

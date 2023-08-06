@@ -35,19 +35,19 @@ class MobyDickPDFTest(TestCase):
                 page.remove_header(header)
                 page.remove_footer(footer)
 
-        self.assertEquals(pdf.get_expected_title(), "moby dick")
+        self.assertEqual(pdf.get_expected_title(), "moby dick")
 
     def test_detect_footer(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
-        self.assertEquals(
+        self.assertEqual(
             pdf.pages.detect_footer(), "Created for Lit2Go on the web at etc.usf.edu"
         )
 
     def test_detect_header(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
-        self.assertEquals(
+        self.assertEqual(
             pdf.pages.detect_header(), "Moby Dick:\xa0Chapter 1\xa0by Herman Melville"
         )
 
@@ -67,7 +67,7 @@ class MobyDickPDFTest(TestCase):
                 page.remove_footer(footer)
 
         pdf.pages.set_page_number_position()
-        self.assertEquals(
+        self.assertEqual(
             pdf.pages[1].content,
             """Circumambulate the city of a dreamy Sabbath afternoon. Go from <br/>Corlears Hook to Coenties Slip, and from thence, by Whitehall, <br/>northward. What do you see?- Posted like silent sentinels all around the <br/>town, stand thousands upon thousands of mortal men fixed in ocean <br/>reveries. Some leaning against the spiles; some seated upon the pier-<br/>heads; some looking over the bulwarks of ships from China; some high <br/>aloft in the rigging, as if striving to get a still better seaward peep. But <br/>these are all landsmen; of week days pent up in lath and plaster- tied to <br/>counters, nailed to benches, clinched to desks. How then is this? Are the <br/>green fields gone? What do they here?<br/>
 But look! here come more crowds, pacing straight for the water, and <br/>seemingly bound for a dive. Strange! Nothing will content them but the <br/>extremest limit of the land; loitering under the shady lee of yonder <br/>warehouses will not suffice. No. They must get just as nigh the water as <br/>they possibly can without falling And there they stand- miles of them- <br/>leagues. Inlanders all, they come from lanes and alleys, streets avenues- <br/>north, east, south, and west. Yet here they all unite. Tell me, does the <br/>magnetic virtue of the needles of the compasses of all those ships attract <br/>them thither?<br/>
@@ -91,13 +91,13 @@ But here is an artist. He desires to paint you the dreamiest, shadiest, <br/>qu
                 page.remove_footer(footer)
 
         pdf.pages.set_page_number_position()
-        self.assertEquals(pdf.pages[0].page_number_position, "bottom")
+        self.assertEqual(pdf.pages[0].page_number_position, "bottom")
 
     def test_pages_content(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
 
-        self.assertEquals(
+        self.assertEqual(
             pdf.pages._data[1].text_content,
             """Moby Dick: Chapter 1 by Herman Melville
 Circumambulate the city of a dreamy Sabbath afternoon. Go from Corlears Hook to Coenties Slip, and from thence, by Whitehall, northward. What do you see?- Posted like silent sentinels all around the town, stand thousands upon thousands of mortal men fixed in ocean reveries. Some leaning against the spiles; some seated upon the pier-heads; some looking over the bulwarks of ships from China; some high aloft in the rigging, as if striving to get a still better seaward peep. But these are all landsmen; of week days pent up in lath and plaster- tied to counters, nailed to benches, clinched to desks. How then is this? Are the green fields gone? What do they here?
@@ -112,7 +112,7 @@ Created for Lit2Go on the web at etc.usf.edu""",
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
 
-        self.assertEquals(
+        self.assertEqual(
             pdf.pages._data[1].cleaned_text_content,
             """Moby Dick: Chapter 1 by Herman Melville
 Circumambulate the city of a dreamy Sabbath afternoon. Go from Corlears Hook to Coenties Slip, and from thence, by Whitehall, northward. What do you see?- Posted like silent sentinels all around the town, stand thousands upon thousands of mortal men fixed in ocean reveries. Some leaning against the spiles; some seated upon the pier-heads; some looking over the bulwarks of ships from China; some high aloft in the rigging, as if striving to get a still better seaward peep. But these are all landsmen; of week days pent up in lath and plaster- tied to counters, nailed to benches, clinched to desks. How then is this? Are the green fields gone? What do they here?
@@ -128,12 +128,12 @@ Created for Lit2Go on the web at etc.usf.edu""",
         pdf.load()
         for i in range(len(pdf.pages)):
             if i == len(pdf.pages) - 1:
-                self.assertEquals(
+                self.assertEqual(
                     pdf.pages._data[i].next_page,
                     None,
                 )
             else:
-                self.assertEquals(
+                self.assertEqual(
                     pdf.pages._data[i].next_page.idx,
                     pdf.pages._data[i + 1].idx,
                 )
@@ -151,5 +151,5 @@ Created for Lit2Go on the web at etc.usf.edu""",
     def test_to_html(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
-        self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
+        self.assertEqual(len(pdf.pages), self.EXPECTED_PAGES)
         self.assertGreater(os.path.getsize(f"/tmp/{self.EPUB_NAME}"), 0)

@@ -114,12 +114,12 @@ class HTMLPageTest(TestCase):
     def test_remove_header(self):
         page = HTMLPage(0, "<p>something</p>\nBlah blah</br>")
         page.remove_header("something")
-        self.assertEquals(page.text_content, "Blah blah")
+        self.assertEqual(page.text_content, "Blah blah")
 
     def test_remove_footer(self):
         page = HTMLPage(0, "<p>something</p>\nBlah blah</br>")
         page.remove_footer("Blah blah")
-        self.assertEquals(page.text_content, "something")
+        self.assertEqual(page.text_content, "something")
 
 
 class HTMLExPageTest(TestCase):

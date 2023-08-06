@@ -39,23 +39,23 @@ class VortexPDFTest(TestCase):
                 page.remove_header(header)
                 page.remove_footer(footer)
 
-        self.assertEquals(pdf.get_expected_title(), "the vortex blaster")
+        self.assertEqual(pdf.get_expected_title(), "the vortex blaster")
 
     def test_detect_footer(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
-        self.assertEquals(pdf.pages.detect_footer(), None)
+        self.assertEqual(pdf.pages.detect_footer(), None)
 
     def test_detect_header(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
-        self.assertEquals(pdf.pages.detect_header(), None)
+        self.assertEqual(pdf.pages.detect_header(), None)
 
     def test_page_number_position(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         pdf.pages.set_page_number_position()
-        self.assertEquals(pdf.pages[0].page_number_position, None)
+        self.assertEqual(pdf.pages[0].page_number_position, None)
 
     def test_pages_content(self):
         pdf = PDF(path=self.PDF_PATH)
@@ -82,7 +82,7 @@ epubBooks.com
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
 
-        self.assertEquals(
+        self.assertEqual(
             pdf.pages._data[0].cleaned_text_content,
             """INTRODUCING "Storm" Cloud, who, through tragedy, is destined to become the most noted figure in the
 galaxy—
@@ -102,12 +102,12 @@ epubBooks.com""",
         pdf.load()
         for i in range(len(pdf.pages)):
             if i == len(pdf.pages) - 1:
-                self.assertEquals(
+                self.assertEqual(
                     pdf.pages._data[i].next_page,
                     None,
                 )
             else:
-                self.assertEquals(
+                self.assertEqual(
                     pdf.pages._data[i].next_page.idx,
                     pdf.pages._data[i + 1].idx,
                 )
@@ -125,7 +125,7 @@ epubBooks.com""",
     def test_to_html(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
-        self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
+        self.assertEqual(len(pdf.pages), self.EXPECTED_PAGES)
         self.assertGreater(os.path.getsize(f"/tmp/{self.EPUB_NAME}"), 0)
 
 
@@ -138,14 +138,14 @@ class VortexPDFTest_EX(TestCase):
         pdf = HTMLEX_PDF(path=self.PDF_PATH)
         pdf.to_html()
         pdf.modify_pages()
-        self.assertEquals(len(list(pdf.dot_pages)), self.EXPECTED_PAGES)
+        self.assertEqual(len(list(pdf.dot_pages)), self.EXPECTED_PAGES)
 
     def test_pages(self):
         pdf = HTMLEX_PDF(path=self.PDF_PATH)
         pdf.to_epub(path="/tmp/pdf2epub_test.epub")
 
-        self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
-        self.assertEquals(
+        self.assertEqual(len(pdf.pages), self.EXPECTED_PAGES)
+        self.assertEqual(
             pdf.pages[0].text_content,
             """INTRODUCING "Storm" Cloud, who, through tragedy, is destined to become the most noted figure in the
 galaxy—
@@ -162,4 +162,4 @@ epubBooks.com""",
     def test_get_expected_title(self):
         pdf = HTMLEX_PDF(path=self.PDF_PATH)
         pdf.to_epub(path="/tmp/pdf2epub_test.epub")
-        self.assertEquals(pdf.get_expected_title(), "The Vortex Blaster")
+        self.assertEqual(pdf.get_expected_title(), "The Vortex Blaster")

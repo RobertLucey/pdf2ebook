@@ -35,29 +35,29 @@ class RoomWithAViewPDFTest(TestCase):
                 page.remove_header(header)
                 page.remove_footer(footer)
 
-        self.assertEquals(pdf.get_expected_title(), "a room with a view")
+        self.assertEqual(pdf.get_expected_title(), "a room with a view")
 
     def test_detect_footer(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
-        self.assertEquals(pdf.pages.detect_footer(), None)
+        self.assertEqual(pdf.pages.detect_footer(), None)
 
     def test_detect_header(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
-        self.assertEquals(pdf.pages.detect_header(), None)
+        self.assertEqual(pdf.pages.detect_header(), None)
 
     def test_page_number_position(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
         pdf.pages.set_page_number_position()
-        self.assertEquals(pdf.pages[0].page_number_position, "bottom")
+        self.assertEqual(pdf.pages[0].page_number_position, "bottom")
 
     def test_pages_content(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
 
-        self.assertEquals(
+        self.assertEqual(
             pdf.pages._data[0].text_content,
             """A ROOM WITH A VIEW 
   
@@ -76,7 +76,7 @@ Candida Martinelli’s Italophile Site""",
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
 
-        self.assertEquals(
+        self.assertEqual(
             pdf.pages._data[0].cleaned_text_content,
             """A ROOM WITH A VIEW
 
@@ -96,12 +96,12 @@ Candida Martinelli’s Italophile Site""",
         pdf.load()
         for i in range(len(pdf.pages)):
             if i == len(pdf.pages) - 1:
-                self.assertEquals(
+                self.assertEqual(
                     pdf.pages._data[i].next_page,
                     None,
                 )
             else:
-                self.assertEquals(
+                self.assertEqual(
                     pdf.pages._data[i].next_page.idx,
                     pdf.pages._data[i + 1].idx,
                 )
@@ -120,4 +120,4 @@ Candida Martinelli’s Italophile Site""",
     def test_to_html(self):
         pdf = PDF(path=self.PDF_PATH)
         pdf.load()
-        self.assertEquals(len(pdf.pages), self.EXPECTED_PAGES)
+        self.assertEqual(len(pdf.pages), self.EXPECTED_PAGES)
