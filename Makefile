@@ -33,5 +33,5 @@ quick_build:
 test: build test_requirements quick_test
 
 quick_test:
-	$(IN_ENV) $(TEST_CONTEXT) coverage run -m unittest
-	$(IN_ENV) $(TEST_CONTEXT) coverage report -m
+	$(IN_ENV) $(TEST_CONTEXT) coverage run -m pytest
+	$(IN_ENV) coverage report -m --skip-empty --include="src/*"

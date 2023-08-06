@@ -1,4 +1,4 @@
 mock
 coverage
-nose-timer
+pytest
 Pillow
